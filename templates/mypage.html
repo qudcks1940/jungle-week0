@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <h1 class="title">My Page</h1>
+        <p>Hello, {{ current_user.nickname }}!</p>
+        <h2>Participated Balance Games</h2>
+        <ul>
+            {% for question in current_user.participant_questions %}
+                <li>{{ question }}</li>
+            {% endfor %}
+        </ul>
+        <h2>Created Balance Games</h2>
+        <ul>
+            {% for question in current_user.create_questions %}
+                <li>{{ question }}</li>
+            {% endfor %}
+        </ul>
+        <a class="button is-primary" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</section>
+</body>
+</html>
