@@ -1,56 +1,431 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>정글 밸런스 게임
-    </title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
-        <!-- jQuery -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <!-- Font Awesome -->
-        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <title>정글 밸런스 게임</title>
 
-        <style>
-            /* 반응형 웹 페이지를 위한 wrap 클래스 스타일 */
-            .wrap {
-                width: 100%;
-                padding-right: 15px;
-                padding-left: 15px;
-                margin-right: auto;
-                margin-left: auto;
-            }
+    <!-- Bulma -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Font Awesome -->
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 
-            @media (min-width: 576px) {
-            .wrap {
-                max-width: 540px;
-            }
-            }
-
-            @media (min-width: 768px) {
-            .wrap {
-                max-width: 720px;
-            }
-            }
-
-            @media (min-width: 992px) {
-            .wrap {
-                max-width: 960px;
-            }
-            }
-
-            @media (min-width: 1200px) {
-            .wrap {
-                max-width: 1140px;
-            }
+    <style>
+        body {
+            max-width: 1000px;
+            margin: auto;
+            padding: 0 15px;
         }
 
-        </style>
+        header > #top-nav {
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .banner {
+            margin-top: 5px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .category-card-wrapper {
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .wrap-title {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .card-height {
+            height: 100%;
+        }
+
+        .category-card.active {
+            background-color: aquamarine;
+        }
+
+        .card-wrap {
+            padding: 10px;
+        }
+
+        .question-card {
+            margin-top: 1rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .count-group {
+            display: flex;
+        }
+        header>#top-nav,
+        #sub-nav {
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .nav-main {
+            display: flex;
+        }
+
+        .question-card {
+            margin-top: 1rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .count-group {
+            display: flex;
+        }
+
+        .q-info {
+            margin-right: 10px;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="wrap"    
+    <div class="wrap">
+        <header>
+            <nav id="top-nav" role="navigation" class="is-white">
+                <!-- navbar-brand: 항상 visible -->
+                <!-- navbar-menu: 모바일 기기에서 hidden, desktop에서만 visible -->
+                <!-- navbar-item: a 또는 div 태그를 사용 -->
+
+                <div class="nav-logo">
+                    <a class="navbar-item" href="/">
+                        <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
+                    </a>
+                </div>
+
+                <div class="nav-main">
+                    <div class="field is-grouped">
+                        <p class="control">
+                            <a class="button is-light" href="/login">
+                                <span>로그인</span>
+                            </a>
+                        </p>
+                        <p class="control">
+                            <a class="button is-light" href="/singin">
+                                <span>회원가입</span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </nav>
+
+            <section class="hero is-success">
+                <div class="hero-body center">
+                    <p class="title">정글 밸런스 게임</p>
+                    <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+                </div>
+            </section>
+        </header>
+
+        <div class="category-card-wrapper">
+            <div class="wrap-title">
+                원하는 카테고리의 밸런스 게임을 시작해 보세요!
+            </div>
+
+            <div class="columns">
+                <div class="column">
+                    <div id="category-life" class="card category-card card-height">
+                        <div class="card-content">
+                            <p class="title is-6">
+                                정글 생활
+                            </p>
+                            <p class="subtitle is-6">어떤 생활 패턴을 선호하시나요?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div id="category-food" class="card category-card card-height">
+                        <div class="card-content">
+                            <p class="title is-6">
+                                정글 음식
+                            </p>
+                            <p class="subtitle is-6">어떤 음식을 어떻게 먹을까요?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div id="category-exercise" class="card category-card card-height">
+                        <div class="card-content">
+                            <p class="title is-6">
+                                정글 운동
+                            </p>
+                            <p class="subtitle is-6">문지 캠퍼스에서의 운동 계획은?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div id="category-study" class="card category-card card-height">
+                        <div class="card-content">
+                            <p class="title is-6">
+                                정글 공부
+                            </p>
+                            <p class="subtitle is-6">나에게 최적화된 공부법은?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div id="sub-nav">
+            <div class="filter-group">
+                <div class="field is-grouped">
+                    <p class="control">
+                        <a id="filter-likes" class="filter-button button is-rounded is-hover is-light" href="#">
+                            <span>좋아요 순</span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a id="filter-participation" class="filter-button button is-rounded is-hover is-light" href="#">
+                            <span>참여도 순</span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a id="filter-hits" class="filter-button button is-rounded is-hover is-light" href="#">
+                            <span>조회 순</span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a id="filter-date" class="filter-button button is-rounded is-hover is-light" href="#">
+                            <span>최신 순</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="regist-question">
+                <p class="control">
+                    <a class="button is-link" href="/api/question">
+                        <span>새로운 질문 등록</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <content>
+            <div class="card-wrap">
+
+                <div class="question-card card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="https://bulma.io/assets/images/placeholders/96x96.png"
+                                        alt="Placeholder image" />
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-4">아침밥 vs 아침잠</p>
+                                <p class="subtitle is-6">치키차카</p>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="question-date">
+                                <p>2024.03.31. 16:00:00</p>
+                            </div>
+
+                            <div class="count-group">
+                                <div class="q-info likes">
+                                    <i class="fas fa-solid fa-heart"></i> <span>3</span>
+                                </div>
+                                <div class="q-info parti">
+                                    <i class="fas fa-solid fa-users"></i> <span>4</span>
+                                </div>
+
+                                <div class="q-info hits">
+                                    <i class="fas fa-regular fa-eye"></i> <span>5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-card card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="https://bulma.io/assets/images/placeholders/96x96.png"
+                                        alt="Placeholder image" />
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-4">아침밥 vs 아침잠</p>
+                                <p class="subtitle is-6">치키차카</p>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="question-date">
+                                <p>2024.03.31. 16:00:00</p>
+                            </div>
+
+                            <div class="count-group">
+                                <div class="q-info likes">
+                                    <i class="fas fa-solid fa-heart"></i> <span>3</span>
+                                </div>
+                                <div class="q-info parti">
+                                    <i class="fas fa-solid fa-users"></i> <span>4</span>
+                                </div>
+
+                                <div class="q-info hits">
+                                    <i class="fas fa-regular fa-eye"></i> <span>5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-card card">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-48x48">
+                                    <img src="https://bulma.io/assets/images/placeholders/96x96.png"
+                                        alt="Placeholder image" />
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-4">아침밥 vs 아침잠</p>
+                                <p class="subtitle is-6">치키차카</p>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="question-date">
+                                <p>2024.03.31. 16:00:00</p>
+                            </div>
+
+                            <div class="count-group">
+                                <div class="q-info likes">
+                                    <i class="fas fa-solid fa-heart"></i> <span>3</span>
+                                </div>
+                                <div class="q-info parti">
+                                    <i class="fas fa-solid fa-users"></i> <span>4</span>
+                                </div>
+
+                                <div class="q-info hits">
+                                    <i class="fas fa-regular fa-eye"></i> <span>5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </content>
+    </div>
+
+    <script>
+        let categoryModeArray = {
+            'categoryLife': 'life',
+            'categoryFood': 'food',
+            'categoryExercise': 'exercise',
+            'categoryStudy': 'study'
+        }
+
+        let sortModeArray = {
+            'filterLikes': 'like_count',
+            'filterParti': 'participant_count',
+            'filterHits': 'hit_count',
+            'filterDate': 'created_at'
+        }
+
+        let categoryMode = categoryModeArray['categoryLife'];
+        let sortMode = sortModeArray['filterLikes'];
+
+        function resetDisplayCategory() {
+            categoryLife.classList.remove("active");
+            categoryFood.classList.remove("active");
+            categoryExercise.classList.remove("active");
+            categoryStudy.classList.remove("active");
+        }
+
+        let categoryLife = document.getElementById("category-life");
+        let categoryFood = document.getElementById("category-food");
+        let categoryExercise = document.getElementById("category-exercise");
+        let categoryStudy = document.getElementById("category-study");
+
+        categoryLife.addEventListener("click", function () {
+            resetDisplayCategory();
+            categoryLife.classList.add("active");
+        })
+
+        categoryFood.addEventListener("click", function () {
+            resetDisplayCategory();
+            categoryFood.classList.add("active");
+        })
+
+        categoryExercise.addEventListener("click", function () {
+            resetDisplayCategory();
+            categoryExercise.classList.add("active");
+        })
+
+        categoryStudy.addEventListener("click", function () {
+            resetDisplayCategory();
+            categoryStudy.classList.add("active");
+        })
+
+
+        function resetDisplayFilter() {
+            filterLikes.classList.remove("is-active");
+            filterParti.classList.remove("is-active");
+            filterHits.classList.remove("is-active");
+            filterDate.classList.remove("is-active");
+        }
+
+        let filterLikes = document.getElementById("filter-likes");
+        let filterParti = document.getElementById("filter-participation");
+        let filterHits = document.getElementById("filter-hits");
+        let filterDate = document.getElementById("filter-date");
+
+        filterLikes.addEventListener("click", function () {
+            resetDisplayFilter();
+            filterLikes.classList.add("is-active");
+        })
+
+        filterParti.addEventListener("click", function () {
+            resetDisplayFilter();
+            filterParti.classList.add("is-active");
+        })
+
+        filterHits.addEventListener("click", function () {
+            resetDisplayFilter();
+            filterHits.classList.add("is-active");
+        })
+
+        filterDate.addEventListener("click", function () {
+            resetDisplayFilter();
+            filterDate.classList.add("is-active");
+        })
+
+    </script>
 </body>
+
 </html>
