@@ -6,127 +6,39 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
+    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/question.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Black+And+White+Picture&display=swap" rel="stylesheet">
 
     <title>질문</title>
-
-    <style>
-        body {
-            max-width: 1000px;
-            min-width: 800px;
-            margin: auto;
-            color: black;
-        }
-
-        .question-box {
-            height: 300px;
-            background: whitesmoke;
-        }
-
-        .question-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .question-maker-info > .tag {
-            font-weight: bold;
-        }
-
-        .question-box {
-            display: flex;
-            align-items: center;
-            margin-top: 5px;
-            padding: 20px;
-            border-radius: 5px;
-        }
-
-        .button-box {
-            width: 45%;
-            height: 100%;
-            border-radius: 5px;
-        }
-
-        .question {
-            width: 100%;
-            height: 100%;
-            color: black;
-            background: transparent;
-            border: transparent;
-            box-shadow: none;
-            font-weight: bold;
-            font-size: 40px;
-        }
-
-        .question-select {
-            background-image: linear-gradient(30deg, #98ff9f, #00ff12);
-        }
-
-        .question:hover {
-            background: rgba(0, 0, 0, 0.1)
-        }
-
-        .versus {
-            display: inline-block;
-            text-align: center;
-            width: 10%;
-            font-size: 60px;
-            font-family: "Black And White Picture", system-ui;
-            color: #cd0002
-        }
-
-        .versus-v {
-            position: relative;
-            bottom: 5px;
-            left: 7px;
-        }
-
-        .versus-s {
-            position: relative;
-            top: 5px;
-            right: 7px;
-        }
-
-        .comment-input {
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .comment-input > textarea {
-            margin-right: 20px;
-        }
-
-        .comment-input > .button-right-align {
-            margin-top: 5px;
-            text-align: end;
-        }
-
-        .comment-box {
-            padding: 20px;
-            display: flex;
-            border-bottom: whitesmoke solid 1px;
-        }
-
-        .comment-nickname {
-            width: 170px;
-            padding-right: 10px;
-            font-weight: bold;
-        }
-
-        .comment-text {
-            width: 100%;
-        }
-
-        .created-at {
-            font-weight: normal;
-            color: darkgrey;
-        }
-    </style>
 </head>
 <body>
+
+<header>
+    <nav id="top-nav" role="navigation" class="is-white">
+        <div class="nav-logo">
+            <a class="navbar-item" href="/static">
+                <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
+            </a>
+        </div>
+
+        <div class="nav-main">
+            <div class="field is-grouped">
+                <button class="button">로그인</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero is-success banner">
+        <div class="hero-body center">
+            <p class="title">정글 밸런스 게임</p>
+            <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+        </div>
+    </section>
+</header>
 
 <section class="question-info">
     <div class="question-maker-info">
