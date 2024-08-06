@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo import MongoClient
 import jwt
@@ -27,18 +27,16 @@ Member_collection.create_index('id', unique=True)
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = None
-        if 'Authorization' in request.headers:
-            token = request.headers['Authorization'].split(" ")[1]
+        token = session.get('token')
         if not token:
-            return jsonify({'message': 'Token is missing!'}), 401
+            return redirect(url_for('login'))
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Member_collection.find_one({'id': data['user']})
             if current_user is None:
-                return jsonify({'message': 'User not found!'}), 401
+                return redirect(url_for('login'))
         except:
-            return jsonify({'message': 'Token is invalid!'}), 401
+            return redirect(url_for('login'))
         return f(current_user, *args, **kwargs)
     return decorated
 
@@ -62,7 +60,7 @@ def login():
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
             }, app.config['SECRET_KEY'], algorithm="HS256")
             session['token'] = token
-            return redirect(url_for('mypage'))
+            return redirect(url_for('home'))
         else:
             return render_template('login.html', message="유효하지 않은 아이디거나 비밀번호가 틀렸습니다.", error=True)
     return render_template('login.html')
@@ -102,14 +100,13 @@ def protected(current_user):
     return render_template('protected.html', current_user=current_user)
 
 # 마이페이지
-@app.route('/mypage')
+@app.route('/mypage', methods = ['GET'])
 @token_required
 def mypage(current_user):
     return render_template('mypage.html', current_user=current_user)
 
-
 # 로그아웃
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     session.pop('token', None)
     flash('You have successfully logged out', 'success')
@@ -117,3 +114,23 @@ def logout():
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
+
+
+# JWT 토큰을 요구하는 데코레이터
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
+            if current_user is None:
+                return jsonify({'message': 'User not found!'}), 401
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 401
+        return f(current_user, *args, **kwargs)
+    return decorated

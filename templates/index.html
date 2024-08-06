@@ -23,7 +23,7 @@
             padding: 0 15px;
         }
 
-        header > #top-nav {
+        header>#top-nav {
             overflow: hidden;
             display: flex;
             justify-content: space-between;
@@ -76,6 +76,7 @@
         .count-group {
             display: flex;
         }
+
         header>#top-nav,
         #sub-nav {
             overflow: hidden;
@@ -108,239 +109,229 @@
 </head>
 
 <body>
-    <div class="wrap">
-        <header>
-            <nav id="top-nav" role="navigation" class="is-white">
-                <!-- navbar-brand: 항상 visible -->
-                <!-- navbar-menu: 모바일 기기에서 hidden, desktop에서만 visible -->
-                <!-- navbar-item: a 또는 div 태그를 사용 -->
-
-                <div class="nav-logo">
-                    <a class="navbar-item" href="/">
-                        <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
-                    </a>
-                </div>
-
-                <div class="nav-main">
-                    <div class="field is-grouped">
-                        <p class="control">
-                            <a class="button is-light" href="/login">
-                                <span>로그인</span>
-                            </a>
-                        </p>
-                        <p class="control">
-                            <a class="button is-light" href="/singin">
-                                <span>회원가입</span>
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </nav>
-
-            <section class="hero is-success">
-                <div class="hero-body center">
-                    <p class="title">정글 밸런스 게임</p>
-                    <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
-                </div>
-            </section>
-        </header>
-
-        <div class="category-card-wrapper">
-            <div class="wrap-title">
-                원하는 카테고리의 밸런스 게임을 시작해 보세요!
+    <header>
+        <nav id="top-nav" role="navigation" class="is-white">
+            <div class="nav-logo">
+                <a class="navbar-item" href="/">
+                    <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
+                </a>
             </div>
 
-            <div class="columns">
-                <div class="column">
-                    <div id="category-life" class="card category-card card-height">
-                        <div class="card-content">
-                            <p class="title is-6">
-                                정글 생활
-                            </p>
-                            <p class="subtitle is-6">어떤 생활 패턴을 선호하시나요?</p>
-                        </div>
+            <div class="nav-main">
+                <div class="field is-grouped">
+                    {% if session.get('token') %}
+                        <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                            <button class="button">로그아웃</button>
+                        </form>
+                        <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
+                    {% else %}
+                        <a class="button" href="{{ url_for('login') }}">로그인</a>
+                    {% endif %}
+                </div>
+            </div>
+            
+        </nav>
+
+        <section class="hero is-success banner">
+            <div class="hero-body center">
+                <p class="title">정글 밸런스 게임</p>
+                <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+            </div>
+        </section>
+    </header>
+
+    <div class="category-card-wrapper">
+        <div class="wrap-title">
+            원하는 카테고리의 밸런스 게임을 시작해 보세요!
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div id="category-life" class="card category-card card-height">
+                    <div class="card-content">
+                        <p class="title is-6">
+                            정글 생활
+                        </p>
+                        <p class="subtitle is-6">어떤 생활 패턴을 선호하시나요?</p>
                     </div>
                 </div>
-                <div class="column">
-                    <div id="category-food" class="card category-card card-height">
-                        <div class="card-content">
-                            <p class="title is-6">
-                                정글 음식
-                            </p>
-                            <p class="subtitle is-6">어떤 음식을 어떻게 먹을까요?</p>
-                        </div>
+            </div>
+            <div class="column">
+                <div id="category-food" class="card category-card card-height">
+                    <div class="card-content">
+                        <p class="title is-6">
+                            정글 음식
+                        </p>
+                        <p class="subtitle is-6">어떤 음식을 어떻게 먹을까요?</p>
                     </div>
                 </div>
-                <div class="column">
-                    <div id="category-exercise" class="card category-card card-height">
-                        <div class="card-content">
-                            <p class="title is-6">
-                                정글 운동
-                            </p>
-                            <p class="subtitle is-6">문지 캠퍼스에서의 운동 계획은?</p>
-                        </div>
+            </div>
+            <div class="column">
+                <div id="category-exercise" class="card category-card card-height">
+                    <div class="card-content">
+                        <p class="title is-6">
+                            정글 운동
+                        </p>
+                        <p class="subtitle is-6">문지 캠퍼스에서의 운동 계획은?</p>
                     </div>
                 </div>
-                <div class="column">
-                    <div id="category-study" class="card category-card card-height">
-                        <div class="card-content">
-                            <p class="title is-6">
-                                정글 공부
-                            </p>
-                            <p class="subtitle is-6">나에게 최적화된 공부법은?</p>
-                        </div>
+            </div>
+            <div class="column">
+                <div id="category-study" class="card category-card card-height">
+                    <div class="card-content">
+                        <p class="title is-6">
+                            정글 공부
+                        </p>
+                        <p class="subtitle is-6">나에게 최적화된 공부법은?</p>
                     </div>
                 </div>
             </div>
         </div>
-        <hr>
-        <div id="sub-nav">
-            <div class="filter-group">
-                <div class="field is-grouped">
-                    <p class="control">
-                        <a id="filter-likes" class="filter-button button is-rounded is-hover is-light" href="#">
-                            <span>좋아요 순</span>
-                        </a>
-                    </p>
-                    <p class="control">
-                        <a id="filter-participation" class="filter-button button is-rounded is-hover is-light" href="#">
-                            <span>참여도 순</span>
-                        </a>
-                    </p>
-                    <p class="control">
-                        <a id="filter-hits" class="filter-button button is-rounded is-hover is-light" href="#">
-                            <span>조회 순</span>
-                        </a>
-                    </p>
-                    <p class="control">
-                        <a id="filter-date" class="filter-button button is-rounded is-hover is-light" href="#">
-                            <span>최신 순</span>
-                        </a>
-                    </p>
-                </div>
-            </div>
-            <div class="regist-question">
+    </div>
+    <hr>
+    <div id="sub-nav">
+        <div class="filter-group">
+            <div class="field is-grouped">
                 <p class="control">
-                    <a class="button is-link" href="/api/question">
-                        <span>새로운 질문 등록</span>
+                    <a id="filter-likes" class="filter-button button is-rounded is-hover is-light" href="#">
+                        <span>좋아요 순</span>
+                    </a>
+                </p>
+                <p class="control">
+                    <a id="filter-participation" class="filter-button button is-rounded is-hover is-light" href="#">
+                        <span>참여도 순</span>
+                    </a>
+                </p>
+                <p class="control">
+                    <a id="filter-hits" class="filter-button button is-rounded is-hover is-light" href="#">
+                        <span>조회 순</span>
+                    </a>
+                </p>
+                <p class="control">
+                    <a id="filter-date" class="filter-button button is-rounded is-hover is-light" href="#">
+                        <span>최신 순</span>
                     </a>
                 </p>
             </div>
         </div>
+        <div class="regist-question">
+            <p class="control">
+                <a class="button is-link" href="/api/question">
+                    <span>새로운 질문 등록</span>
+                </a>
+            </p>
+        </div>
+    </div>
 
-        <content>
-            <div class="card-wrap">
+    <content>
+        <div class="card-wrap">
 
-                <div class="question-card card">
-                    <div class="card-content">
-                        <div class="media">
-                            <div class="media-left">
-                                <figure class="image is-48x48">
-                                    <img src="https://bulma.io/assets/images/placeholders/96x96.png"
-                                        alt="Placeholder image" />
-                                </figure>
-                            </div>
-                            <div class="media-content">
-                                <p class="title is-4">아침밥 vs 아침잠</p>
-                                <p class="subtitle is-6">치키차카</p>
-                            </div>
+            <div class="question-card card">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image is-48x48">
+                                <img src="https://bulma.io/assets/images/placeholders/96x96.png" alt="Placeholder image" />
+                            </figure>
                         </div>
-
-                        <div class="card-footer">
-                            <div class="question-date">
-                                <p>2024.03.31. 16:00:00</p>
-                            </div>
-
-                            <div class="count-group">
-                                <div class="q-info likes">
-                                    <i class="fas fa-solid fa-heart"></i> <span>3</span>
-                                </div>
-                                <div class="q-info parti">
-                                    <i class="fas fa-solid fa-users"></i> <span>4</span>
-                                </div>
-
-                                <div class="q-info hits">
-                                    <i class="fas fa-regular fa-eye"></i> <span>5</span>
-                                </div>
-                            </div>
+                        <div class="media-content">
+                            <p class="title is-4">아침밥 vs 아침잠</p>
+                            <p class="subtitle is-6">치키차카</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="question-card card">
-                    <div class="card-content">
-                        <div class="media">
-                            <div class="media-left">
-                                <figure class="image is-48x48">
-                                    <img src="https://bulma.io/assets/images/placeholders/96x96.png"
-                                        alt="Placeholder image" />
-                                </figure>
-                            </div>
-                            <div class="media-content">
-                                <p class="title is-4">아침밥 vs 아침잠</p>
-                                <p class="subtitle is-6">치키차카</p>
-                            </div>
+                    <div class="card-footer">
+                        <div class="question-date">
+                            <p>2024.03.31. 16:00:00</p>
                         </div>
 
-                        <div class="card-footer">
-                            <div class="question-date">
-                                <p>2024.03.31. 16:00:00</p>
+                        <div class="count-group">
+                            <div class="q-info likes">
+                                <i class="fas fa-solid fa-heart"></i> <span>3</span>
+                            </div>
+                            <div class="q-info parti">
+                                <i class="fas fa-solid fa-users"></i> <span>4</span>
                             </div>
 
-                            <div class="count-group">
-                                <div class="q-info likes">
-                                    <i class="fas fa-solid fa-heart"></i> <span>3</span>
-                                </div>
-                                <div class="q-info parti">
-                                    <i class="fas fa-solid fa-users"></i> <span>4</span>
-                                </div>
-
-                                <div class="q-info hits">
-                                    <i class="fas fa-regular fa-eye"></i> <span>5</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="question-card card">
-                    <div class="card-content">
-                        <div class="media">
-                            <div class="media-left">
-                                <figure class="image is-48x48">
-                                    <img src="https://bulma.io/assets/images/placeholders/96x96.png"
-                                        alt="Placeholder image" />
-                                </figure>
-                            </div>
-                            <div class="media-content">
-                                <p class="title is-4">아침밥 vs 아침잠</p>
-                                <p class="subtitle is-6">치키차카</p>
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <div class="question-date">
-                                <p>2024.03.31. 16:00:00</p>
-                            </div>
-
-                            <div class="count-group">
-                                <div class="q-info likes">
-                                    <i class="fas fa-solid fa-heart"></i> <span>3</span>
-                                </div>
-                                <div class="q-info parti">
-                                    <i class="fas fa-solid fa-users"></i> <span>4</span>
-                                </div>
-
-                                <div class="q-info hits">
-                                    <i class="fas fa-regular fa-eye"></i> <span>5</span>
-                                </div>
+                            <div class="q-info hits">
+                                <i class="fas fa-regular fa-eye"></i> <span>5</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </content>
-    </div>
+
+            <div class="question-card card">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image is-48x48">
+                                <img src="https://bulma.io/assets/images/placeholders/96x96.png" alt="Placeholder image" />
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <p class="title is-4">아침밥 vs 아침잠</p>
+                            <p class="subtitle is-6">치키차카</p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="question-date">
+                            <p>2024.03.31. 16:00:00</p>
+                        </div>
+
+                        <div class="count-group">
+                            <div class="q-info likes">
+                                <i class="fas fa-solid fa-heart"></i> <span>3</span>
+                            </div>
+                            <div class="q-info parti">
+                                <i class="fas fa-solid fa-users"></i> <span>4</span>
+                            </div>
+
+                            <div class="q-info hits">
+                                <i class="fas fa-regular fa-eye"></i> <span>5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card card">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image is-48x48">
+                                <img src="https://bulma.io/assets/images/placeholders/96x96.png" alt="Placeholder image" />
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <p class="title is-4">아침밥 vs 아침잠</p>
+                            <p class="subtitle is-6">치키차카</p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="question-date">
+                            <p>2024.03.31. 16:00:00</p>
+                        </div>
+
+                        <div class="count-group">
+                            <div class="q-info likes">
+                                <i class="fas fa-solid fa-heart"></i> <span>3</span>
+                            </div>
+                            <div class="q-info parti">
+                                <i class="fas fa-solid fa-users"></i> <span>4</span>
+                            </div>
+
+                            <div class="q-info hits">
+                                <i class="fas fa-regular fa-eye"></i> <span>5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </content>
 
     <script>
         let categoryModeArray = {
