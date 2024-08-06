@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <h1 class="title">Register</h1>
+        {% if message %}
+        <div class="notification {{ 'is-danger' if error else 'is-success' }}">
+            {{ message }}
+        </div>
+        {% endif %}
+        <form action="{{ url_for('register') }}" method="post">
+            <!-- 동작 과정
+클라이언트 요청: 클라이언트가 특정 URL(예: /register)로 요청을 보냅니다.
+서버 처리: Flask 서버는 해당 요청을 처리하고, register 엔드포인트에 해당하는 HTML 템플릿을 렌더링합니다. 이때 Jinja2 템플릿 엔진을 사용하여 동적인 내용을 삽입합니다.
+HTML 반환: 서버에서 렌더링된 HTML이 클라이언트로 반환됩니다.
+폼 제출: 사용자가 폼을 작성하고 제출하면, 폼 데이터가 지정된 액션 URL로 전송됩니다 (method="post"). -->
+            <div class="field">
+                <p class="control has-icons-left has-icons-right">
+                    <input class="input" type="text" name="nickname" placeholder="Nickname" required>
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-user"></i>
+                    </span>
+                </p>
+            </div>
+            <div class="field">
+                <p class="control has-icons-left has-icons-right">
+                    <input class="input" type="text" name="id" placeholder="ID" required>
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-user"></i>
+                    </span>
+                </p>
+            </div>
+            <div class="field">
+                <p class="control has-icons-left">
+                    <input class="input" type="password" name="password" placeholder="Password" required>
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                </p>
+            </div>
+            <div class="field">
+                <p class="control has-icons-left">
+                    <input class="input" type="date" name="birthday" placeholder="Birthday" required>
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-calendar"></i>
+                    </span>
+                </p>
+            </div>
+            <div class="field">
+                <p class="control has-icons-left">
+                    <div class="select">
+                        <select name="gender" required>
+                            <option value="" disabled selected>Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-venus-mars"></i>
+                    </span>
+                </p>
+            </div>
+            <div class="field">
+                <p class="control">
+                    <button class="button is-success">
+                        Register
+                    </button>
+                </p>
+            </div>
+        </form>
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+    </div>
+</section>
+</body>
+</html>
