@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
+    <link rel="stylesheet" href="../static/css/header.css">
+
+    <style>
+        .divider {
+            margin: 20px 0 40px;
+            height: 0;
+            border-bottom: whitesmoke solid 1px;
+        }
+
+        .wrap {
+            width: 500px;
+            margin: auto;
+        }
+
+        .new-question-section {
+            margin-top: 30px;
+        }
+
+        .input-header {
+            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .question-example {
+            margin-top: 30px;
+            color: darkgrey;
+        }
+
+        .new-question-button {
+            margin-top: 50px;
+            text-align: end;
+        }
+    </style>
+
+    <title>질문 등록</title>
+</head>
+<body>
+<header>
+    <nav id="top-nav" role="navigation" class="is-white">
+        <div class="nav-logo">
+            <a class="navbar-item" href="/static">
+                <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
+            </a>
+        </div>
+
+        <div class="nav-main">
+            <div class="field is-grouped">
+                <button class="button">로그인</button>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="divider"></div>
+
+<div class="wrap">
+    <section class="new-question-section">
+        <h1 class="input-header">카테고리</h1>
+        <div class="select">
+            <select>
+                <option>기타</option>
+                <option>생활</option>
+                <option>운동</option>
+                <option>음식</option>
+                <option>공부</option>
+            </select>
+        </div>
+    </section>
+
+    <section class="new-question-section">
+        <h1 class="input-header">질문1</h1>
+        <div class="field">
+            <div class="control">
+                <input class="input" type="text" placeholder="Text input">
+            </div>
+        </div>
+    </section>
+
+    <section class="new-question-section">
+        <h1 class="input-header">질문2</h1>
+        <div class="field">
+            <div class="control">
+                <input class="input" type="text" placeholder="Text input">
+            </div>
+        </div>
+    </section>
+
+    <p class="question-example">ex) 질문1(아침밥 먹기) vs 질문2(아침밥 먹을 시간에 자기)</p>
+
+    <div class="new-question-button">
+        <button class="button is-success is-light">질문 등록</button>
+    </div>
+</div>
+
+</body>
+</html>
