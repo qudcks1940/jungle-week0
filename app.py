@@ -263,6 +263,19 @@ def readCommentList(question_id):
     commentList = list(db.comment.find({'question_id': ObjectId(question_id)}))
     return jsonify({'result': 'success', 'commentList': commentList})
 
+# 댓글 수정
+@app.route('/api/comment/<comment_id>', methods=['PUT'])
+def updateComment(comment_id):
+    content = request.form['content']
+    db.comment.update_one({'_id': ObjectId(comment_id)}, {'$set': {'content': content}})
+    return jsonify({'result': 'success', 'msg': '댓글 수정 완료!'})
+
+# 댓글 삭제
+@app.route('/api/comment/<comment_id>', methods=['DELETE'])
+def deleteComment(comment_id):
+    db.comment.delete_one({'_id': ObjectId(comment_id)})
+    return jsonify({'result': 'success', 'msg': '댓글 삭제 완료!'})
+
 # 질문 등록
 @app.route('/api/question', methods=['POST'])
 @token_required
