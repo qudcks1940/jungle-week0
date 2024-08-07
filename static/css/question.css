@@ -72,13 +72,18 @@ body {
     right: 7px;
 }
 
-.comment-input {
-    width: 100%;
+.comment-count {
     margin-top: 20px;
+    font-weight: bold;
 }
 
-.comment-input > textarea {
-    margin-right: 20px;
+.comment-input {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.comment-update-form > textarea{
+    /* textarea 너비를 부모 컨텐츠에 맞추기 */
 }
 
 .comment-input > .button-right-align {
@@ -86,10 +91,14 @@ body {
     text-align: end;
 }
 
+.comment-area {
+    padding-bottom: 5px;
+    border-bottom: whitesmoke solid 1px;
+}
+
 .comment-box {
     padding: 20px;
     display: flex;
-    border-bottom: whitesmoke solid 1px;
 }
 
 .comment-nickname {
@@ -105,4 +114,12 @@ body {
 .created-at {
     font-weight: normal;
     color: darkgrey;
+}
+
+.comment-btn {
+    text-align: end;
+}
+
+.display-none {
+    display: none;
 }
