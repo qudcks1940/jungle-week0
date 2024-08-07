@@ -163,49 +163,53 @@
                     if (response['result'] == 'success') {
                         $('.comment-list-area').empty()
                         let commentList = response['commentList'];
+                        let currentUserId = "{{ current_user['_id'] }}";  // 현재 로그인한 사용자의 ID
                         for (let i = 0; i < commentList.length; i++) {
                             let comment = commentList[i];
                             let commentId = comment['_id'];
                             let writer = comment['nickname'];
                             let createdAt = comment['created_at'];
                             let content = comment['content'];
+                            let isOwner = comment['member_id'] === currentUserId;  // 작성자와 로그인한 사용자 비교
                             let temp_html = `
-                                <div class="comment-area">
-                                    <input class="comment-id" type="hidden" value="${commentId}">
+                            <div class="comment-area">
+                                <input class="comment-id" type="hidden" value="${commentId}">
 
-                                    <!-- 기본 상태 -->
-                                    <div class="comment-default-form" style="display: block;">
-                                        <div class="comment-box">
-                                            <div class="comment-nickname">
-                                                <span class="tag is-link is-light">${writer}</span>
-                                                <p class="created-at">${createdAt}</p>
-                                            </div>
-                                            <div class="comment-text">
-                                                <p>${content}</p>
-                                            </div>
+                                <!-- 기본 상태 -->
+                                <div class="comment-default-form" style="display: block;">
+                                    <div class="comment-box">
+                                        <div class="comment-nickname">
+                                            <span class="tag is-link is-light">${writer}</span>
+                                            <p class="created-at">${createdAt}</p>
                                         </div>
-                                        <div class="comment-btn">
-                                            <button onclick="updateForm(this)" class="button is-small comment-update">수정</button>
-                                            <button onclick="deleteComment(this)" class="button is-small is-danger  is-light comment-delete">삭제</button>
+                                        <div class="comment-text">
+                                            <p>${content}</p>
                                         </div>
                                     </div>
-
-                                    <!-- 수정 상태 -->
-                                    <div class="comment-update-form" style="display: none;">
-                                        <div class="comment-box">
-                                            <div class="comment-nickname">
-                                                <span class="tag is-link is-light">${writer}</span>
-                                                <p class="created-at">${createdAt}</p>
-                                            </div>
-                                            <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요">${content}</textarea>
-                                        </div>
-                                        <div class="comment-btn">
-                                            <button onclick="updateComment(this)" class="button is-small is-link is-light comment-update">수정</button>
-                                            <button onclick="defualtForm(this)" class="button is-small comment-delete">취소</button>
-                                        </div>
-                                    </div>
+                                    ${isOwner ? `
+                                    <div class="comment-btn">
+                                        <button onclick="updateForm(this)" class="button is-small comment-update">수정</button>
+                                        <button onclick="deleteComment(this)" class="button is-small is-danger  is-light comment-delete">삭제</button>
+                                    </div>` : ''}
                                 </div>
-                            `
+
+                                <!-- 수정 상태 -->
+                                ${isOwner ? `
+                                <div class="comment-update-form" style="display: none;">
+                                    <div class="comment-box">
+                                        <div class="comment-nickname">
+                                            <span class="tag is-link is-light">${writer}</span>
+                                            <p class="created-at">${createdAt}</p>
+                                        </div>
+                                        <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요">${content}</textarea>
+                                    </div>
+                                    <div class="comment-btn">
+                                        <button onclick="updateComment(this)" class="button is-small is-link is-light comment-update">수정</button>
+                                        <button onclick="defualtForm(this)" class="button is-small comment-delete">취소</button>
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        `;
                             $('.comment-list-area').append(temp_html);
                         }
                     }

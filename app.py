@@ -211,7 +211,7 @@ def question(current_user, question_id):
     participant_count = db.check.count_documents({'question_id': ObjectId(question_id)})  # 실제 응답 수 계산
     comment_count = db.comment.count_documents({'question_id': ObjectId(question_id)})
 
-    return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count)
+    return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count, current_user=current_user)
 
 
 # 좋아요 수 증가 및 취소 라우트
@@ -268,6 +268,7 @@ def createComment(current_user):
         'created_at': datetime.datetime.now().strftime('%Y.%m.%d. %H:%M'),
         'content': content
     }
+    print(data)
     db.comment.insert_one(data)
     return jsonify({'result': 'success', 'msg': '댓글 등록 완료!'})
 
