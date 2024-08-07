@@ -260,42 +260,39 @@
 
             let card =
                 `<div id="${category}-${qId}" class="question-card card">
-                <div class="card-content">
-                    <div class="media">
-                        <div class="media-content">
-                            <p class="title is-4">
-                                <span>${q1}</span> VS <span>${q2}<span>
-                            </p>
-                            <p class="subtitle is-6">작성자 불러오기 보류</p>
-                        </div>
-                    </div>
-                    <div class="question-card-footer">
-                        <div class="question-date">
-                            <p>${createdAt}</p>
-                        </div>
-                        <div class="count-group">
-                            <div class="q-info likes">
-                                <i class="fas fa-solid fa-heart"></i> <span>${likesCount}</span>
-                            </div>
-                            <div class="q-info parti">
-                                <i class="fas fa-solid fa-users"></i> <span>${partiCount}</span>
+                    <input class="question-id" type="hidden" value="${qId}">
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-content">
+                                <p class="title is-4">
+                                    <span>${q1}</span> VS <span>${q2}<span>
+                                </p>
+                                <p class="subtitle is-6">작성자 불러오기 보류</p>
                             </div>
                         </div>
+                        <div class="question-card-footer">
+                            <div class="question-date">
+                                <p>${createdAt}</p>
+                            </div>
+                            <div class="count-group">
+                                <div class="q-info likes">
+                                    <i class="fas fa-solid fa-heart"></i> <span>${likesCount}</span>
+                                </div>
+                                <div class="q-info parti">
+                                    <i class="fas fa-solid fa-users"></i> <span>${partiCount}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
             $('#question-list').append(card);
         }
 
         // 질문 카드를 클릭하면 질문 페이지로 이동
-        // let questionClickEventList = document.querySelectorAll(".category-card");
-        // questionClickEventList.forEach(function (question) {
-
-        //     let qInfo = question.getAttribute("id").split['-']
-        //     let qId = qInfo[0];
-        //     let qCategory = qInfo[1];
-        //     location.href = `/question/${qCategory}/${qId}`;
-        // })
+        $(document).on('click', '.question-card', function () {
+            let questionId = $(this).find('.question-id').val()
+            location.href = `/question/${questionId}`;
+        });
     }
 
 </script>
