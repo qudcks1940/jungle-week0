@@ -186,8 +186,8 @@ def logout():
     return redirect(url_for('home'))
 
 # 질문 페이지
-@app.route('/question', methods=['GET'])
-def question():
+@app.route('/question/<question_id>', methods=['GET'])
+def question(question_id):
     if 'like_count' not in session:
         session['like_count'] = 10  # 기본 좋아요 수
     if 'click_count' not in session:
