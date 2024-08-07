@@ -72,6 +72,10 @@ body {
     right: 7px;
 }
 
+.invitor_count {
+    display: inline-block;
+}
+
 .comment-count {
     margin-top: 20px;
     font-weight: bold;
@@ -80,6 +84,10 @@ body {
 .comment-input {
     width: 100%;
     margin-top: 5px;
+}
+
+.like-button {
+    margin-top: -8px;
 }
 
 .comment-update-form > textarea{
