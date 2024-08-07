@@ -10,7 +10,7 @@
 <section class="section">
     <div class="container">
         <h1 class="title">My Page</h1>
-        <p>Hello, {{ current_user.nickname }}!</p>
+        <p>Hello, {{ current_user._id }}!</p>
         <h2>Participated Balance Games</h2>
         <ul>
             {% for question in current_user.participant_questions %}

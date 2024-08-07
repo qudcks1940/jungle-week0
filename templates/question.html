@@ -8,20 +8,49 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
     <link rel="stylesheet" href="../static/css/header.css">
     <link rel="stylesheet" href="../static/css/question.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Black+And+White+Picture&display=swap" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
-
-    </script>
-
+  
     <title>질문</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#like-button').click(function(){
+                $.ajax({
+                    url: "{{ url_for('increment_like') }}",
+                    type: "POST",
+                    success: function(response) {
+                        if (response.like_count !== undefined) {
+                            $('#like-count').text(response.like_count);
+                        }
+                    },
+                    error: function(error) {
+                        console.log("Error:", error);
+                    }
+                });
+            });
+
+            $('.question').click(function(){
+                $.ajax({
+                    url: "{{ url_for('increment_click') }}",
+                    type: "POST",
+                    success: function(response) {
+                        if (response.click_count !== undefined) {
+                            $('#click-count').text(response.click_count);
+                        }
+                    },
+                    error: function(error) {
+                        console.log("Error:", error);
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
-
 <header>
     <nav id="top-nav" role="navigation" class="is-white">
         <div class="nav-logo">
@@ -29,14 +58,12 @@
                 <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
             </a>
         </div>
-
         <div class="nav-main">
             <div class="field is-grouped">
                 <button class="button">로그인</button>
             </div>
         </div>
     </nav>
-
     <section class="hero is-success banner">
         <div class="hero-body center">
             <p class="title">정글 밸런스 게임</p>
@@ -44,47 +71,39 @@
         </div>
     </section>
 </header>
-
 <section class="question-info">
     <div class="question-maker-info">
         <span class="tag is-link is-light">치키차카</span>
         <span class="created-at">2024.08.06. 14:30</span>
     </div>
     <div class="question-indicator">
-        <span>👍10</span>
+        <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;">
+            👍<span id="like-count">{{ like_count }}</span>
+        </button>
         <span>💬10</span>
-        <span>🖱️10</span>
+        <span>🖱️<span id="click-count">{{ click_count }}</span></span>
     </div>
 </section>
-
 <section class="question-box lr-align">
     <div class="button-box question-select">
-        <button class="button question">
-            Success
-        </button>
+        <button class="button question">Success</button>
     </div>
     <div class="versus">
         <span class="versus-v">V</span>
         <span class="versus-s">S</span>
     </div>
-    <div class="button-box ">
-        <button class="button question">
-            Success
-        </button>
+    <div class="button-box">
+        <button class="button question">Success</button>
     </div>
 </section>
-
 <section class="chart-box">
-
 </section>
-
 <section class="comment-input">
     <textarea class="textarea is-success" rows="3" type="text" placeholder="댓글을 작성해주세요"></textarea>
     <div class="button-right-align">
         <button class="button is-success is-light">댓글 등록</button>
     </div>
 </section>
-
 <section>
     <div class="comment-box">
         <div class="comment-nickname">
@@ -114,6 +133,5 @@
         </div>
     </div>
 </section>
-
 </body>
 </html>
