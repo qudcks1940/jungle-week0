@@ -33,6 +33,7 @@
             <div class="nav-main">
                 <div class="field is-grouped">
                     {% if session.get('token') %}
+                        <div class="member-nickname"><span class="tag is-link is-light">{{ memberData['nickname'] }}</span>님 안녕하세요</div>
                         <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
                             <button class="button">로그아웃</button>
                         </form>

@@ -26,3 +26,10 @@ header>#top-nav {
 .center {
     text-align: center;
 }
+
+.member-nickname {
+    display: inline-block;
+    margin-right: 10px;
+    padding-top: 8px;
+    height: 100%;
+}
