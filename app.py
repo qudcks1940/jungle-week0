@@ -122,8 +122,9 @@ def token_required(f):
 
 # 홈 페이지
 @app.route('/')
-def home():
-    return render_template('index.html')
+@token_required
+def home(current_user):
+    return render_template('index.html', memberData=current_user)
 
 # 로그인 페이지 및 처리
 @app.route('/login', methods=['GET', 'POST'])
@@ -279,14 +280,19 @@ def readCommentList(question_id):
 
 # 댓글 수정
 @app.route('/api/comment/<comment_id>', methods=['PUT'])
-def updateComment(comment_id):
-    content = request.form['content']
-    db.comment.update_one({'_id': ObjectId(comment_id)}, {'$set': {'content': content}})
-    return jsonify({'result': 'success', 'msg': '댓글 수정 완료!'})
+@token_required
+def updateComment(current_user, comment_id):
+    writer = db.comment.find_one({'_id': comment_id})['member_id']
+    if current_user['_id'] == writer:
+        content = request.form['content']
+        db.comment.update_one({'_id': ObjectId(comment_id)}, {'$set': {'content': content}})
+        return jsonify({'result': 'success', 'msg': '댓글 수정 완료!'})
+
 
 # 댓글 삭제
 @app.route('/api/comment/<comment_id>', methods=['DELETE'])
-def deleteComment(comment_id):
+@token_required
+def deleteComment(current_user, comment_id):
     db.comment.delete_one({'_id': ObjectId(comment_id)})
     return jsonify({'result': 'success', 'msg': '댓글 삭제 완료!'})
 
