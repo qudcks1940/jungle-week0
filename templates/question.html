@@ -51,20 +51,30 @@
     </script>
 </head>
 <body>
+
+<!-- 헤더 -->
 <header>
     <nav id="top-nav" role="navigation" class="is-white">
         <div class="nav-logo">
-            <a class="navbar-item" href="/static">
+            <a class="navbar-item" href="/">
                 <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
             </a>
         </div>
         <div class="nav-main">
             <div class="field is-grouped">
-                <button class="button">로그인</button>
+                {% if session.get('token') %}
+                    <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                        <button class="button">로그아웃</button>
+                    </form>
+                    <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
+                {% else %}
+                    <a class="button" href="{{ url_for('login') }}">로그인</a>
+                {% endif %}
             </div>
         </div>
     </nav>
-    <section class="hero is-success banner">
+
+    <section class="hero is-success">
         <div class="hero-body center">
             <p class="title">정글 밸런스 게임</p>
             <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
