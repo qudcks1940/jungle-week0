@@ -188,6 +188,14 @@ def logout():
 # 질문 페이지
 @app.route('/question/<question_id>', methods=['GET'])
 def question(question_id):
+    question_data = db.questions.find_one({'_id': ObjectId(question_id)})
+    member_data = db.Member.find_one({'_id': question_data['member_id']})
+    if not question_data:
+        return jsonify({'error': 'Question not found'}), 404
+    if not member_data:
+        return jsonify({'error': 'Member not found'}), 404
+    print(question_data)
+
     if 'like_count' not in session:
         session['like_count'] = 10  # 기본 좋아요 수
     if 'click_count' not in session:
@@ -195,7 +203,7 @@ def question(question_id):
     if 'comments' not in session:
         session['comments'] = []
     comments = session['comments']
-    return render_template('question.html', like_count=session['like_count'], click_count=session['click_count'], comments=comments)
+    return render_template('question.html', like_count=session['like_count'], click_count=session['click_count'], comments=comments, question=question_data, member=member_data)
 
 # 좋아요 수 증가 라우트
 @app.route('/increment_like', methods=['POST'])
@@ -236,7 +244,7 @@ def createQuestion(current_user):
         category = request.form['category']
         question1 = request.form['question1']
         question2 = request.form['question2']
-        createdAt = datetime.datetime.now()
+        createdAt = datetime.datetime.now().strftime('%Y.%m.%d. %H:%M')
 
         data = {
             'member_id': current_user['_id'],

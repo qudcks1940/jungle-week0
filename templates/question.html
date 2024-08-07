@@ -81,10 +81,11 @@
         </div>
     </section>
 </header>
+
 <section class="question-info">
     <div class="question-maker-info">
-        <span class="tag is-link is-light">치키차카</span>
-        <span class="created-at">2024.08.06. 14:30</span>
+        <span class="tag is-link is-light">{{ member['nickname'] }}</span>
+        <span class="created-at">{{ question['created_at'] }}</span>
     </div>
     <div class="question-indicator">
         <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;">
@@ -96,14 +97,14 @@
 </section>
 <section class="question-box lr-align">
     <div class="button-box question-select">
-        <button class="button question">Success</button>
+        <button class="button question">{{ question['question1'] }}</button>
     </div>
     <div class="versus">
         <span class="versus-v">V</span>
         <span class="versus-s">S</span>
     </div>
     <div class="button-box">
-        <button class="button question">Success</button>
+        <button class="button question">{{ question['question2'] }}</button>
     </div>
 </section>
 
