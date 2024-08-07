@@ -193,9 +193,6 @@ def question(current_user, question_id):
     question_data = db.questions.find_one({'_id': ObjectId(question_id)})
     member_data = db.Member.find_one({'_id': current_user['_id']})
     check_data = db.check.find_one({'member_id': current_user['_id'], 'question_id': ObjectId(question_id)})
-    print(question_data)
-    print(member_data)
-    print(check_data)
     if not question_data:
         return jsonify({'error': 'Question not found'}), 404
     if not member_data:
@@ -241,20 +238,31 @@ def increment_click():
         return jsonify({'click_count': session['click_count']})
     return jsonify({'error': 'Click count not found'}), 400
 
-# 댓글 추가 라우트
-@app.route('/add_comment', methods=['POST'])
+# 댓글 등록
+@app.route('/api/question/comment', methods=['POST'])
 @token_required
-def add_comment(current_user):
-    comment_text = request.form['comment']
-    comment = {
-        'nickname': current_user['nickname'],
+def createComment(current_user):
+    questionId = ObjectId(request.form['questionId'])
+    memberId = current_user['_id']
+    member_data = db.Member.find_one({'_id': memberId})
+    writer = member_data['nickname']
+    content = request.form['content']
+    data = {
+        'question_id': questionId,
+        'member_id': memberId,
+        'nickname': writer,
         'created_at': datetime.datetime.now().strftime('%Y.%m.%d. %H:%M'),
-        'text': comment_text
+        'content': content
     }
-    if 'comments' not in session:
-        session['comments'] = []
-    session['comments'].append(comment)
-    return redirect(url_for('question'))
+    db.comment.insert_one(data)
+    return jsonify({'result': 'success', 'msg': '댓글 등록 완료!'})
+
+# 댓글 리스트 조회
+@app.route('/api/question/<question_id>/comment', methods=['GET'])
+def readCommentList(question_id):
+    commentList = list(db.comment.find({'question_id': ObjectId(question_id)}))
+    print(commentList)
+    return jsonify({'result': 'success', 'commentList': commentList})
 
 # 질문 등록
 @app.route('/api/question', methods=['POST'])
