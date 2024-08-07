@@ -225,6 +225,8 @@
 
     // AJAX 통신으로 전체 메모 조회
     function showQuestions() {
+        // 화면의 기존 질문 목록을 지우기
+        $("#question-list").empty();
         $.ajax({
             url: "/api/question/list",
             type: "GET",
@@ -233,10 +235,6 @@
                 'sortMode': sortMode
             },
             success: function (response) {
-                // 화면의 기존 질문 목록을 지우기
-                $("#question-list").empty();
-                console.log('empty')
-
                 // 응답으로 받은 질문 목록을 화면에 띄우기
                 questions = response['questions'];
                 addQuestionCard(questions);
@@ -246,9 +244,10 @@
 
     // 파라미터로 전달받은 질문을 화면에 띄우기
     function addQuestionCard(questions) {
+        console.log('하이용');
         for (let i = 0; i < questions.length; i++) {
             let category = questions[i]['category'];
-            let qId = question[i]['_id']
+            let qId = questions[i]['_id']
             let q1 = questions[i]['question1'];
             let q2 = questions[i]['question2']
 
@@ -282,8 +281,7 @@
                     </div>
                 </div>
             </div>`;
-            let wrap = document.getElementById("question-list");
-            wrap.html(card);
+            $('#question-list').append(card);
         }
 
         // 질문 카드를 클릭하면 질문 페이지로 이동
