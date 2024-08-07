@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Black+And+White+Picture&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -21,14 +23,16 @@
 
         $(document).ready(function(){
             showComments();
-            $('#like-button').click(function(){
+        });
 
-                let questionId = $(this).data('question-id');
-                $.ajax({
-                    url: "{{ url_for('increment_like') }}",
-                    type: "POST",
-                    data: { question_id: questionId },
-                    success: function (response) {
+        $('#like-button').click(function(){
+            let questionId = $(this).data('question-id');
+            $.ajax({
+                url: "{{ url_for('increment_like') }}",
+                type: "POST",
+                data: { question_id: questionId },
+                success: function (response) {
+                    if (response['result'] == 'success') {
                         if (response.like_count !== undefined) {
                             $('#like-count').text(response.like_count);
                             if (response.action === "liked") {
@@ -37,31 +41,13 @@
                                 $('#like-button').removeClass('liked');
                             }
                         }
-                    },
-                    error: function (error) {
-                        console.log("Error:", error);
+                    } else {
+                        alert("로그인 후 이용 가능합니다.");
                     }
-                });
-            });
-
-            $('.question').click(function () {
-                let questionId = $(this).data('question-id');
-                let checkValue = $(this).data('check');  // 버튼의 체크 값 가져오기
-
-                $.ajax({
-                    url: "{{ url_for('increment_click') }}",
-                    type: "POST",
-                    data: { question_id: questionId, check: checkValue },  // 데이터 전송
-                    success: function (response) {
-                        if (response.participant_count !== undefined) {
-                            location.reload();  // 새로고침
-                        }
-                        console.log(response.msg); // 응답 메시지 출력
-                    },
-                    error: function (error) {
-                        console.log("Error:", error);
-                    }
-                });
+                },
+                error: function (error) {
+                    console.log("Error:", error);
+                }
             });
         });
 
@@ -91,6 +77,12 @@
                             </div>
                         `
                         $('.question-box').append(temp_html);
+
+                        // 클릭 수 갱신
+                        $('.invitor_count').empty();
+                        $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
+                    } else {
+                        alert("로그인 후 이용 가능합니다.");
                     }
                 },
                 error: function (error) {
@@ -109,6 +101,7 @@
                     "questionNum": 2
                 },
                 success: function (response) {
+                    console.log(response);
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
                         $('.question-box').empty();
@@ -125,6 +118,12 @@
                             </div>
                         `
                         $('.question-box').append(temp_html);
+
+                        // 클릭 수 갱신
+                        $('.invitor_count').empty();
+                        $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
+                    } else {
+                        alert("로그인 후 이용 가능합니다.");
                     }
                 },
                 error: function (error) {
@@ -231,6 +230,8 @@
                 success: function (response) {
                     if (response['result'] == 'success') {
                         showComments();
+                    } else {
+                        alert("로그인 후 이용 가능합니다.");
                     }
                 }
             });
@@ -320,11 +321,12 @@
         <span class="created-at">{{ question['created_at'] }}</span>
     </div>
     <div class="question-indicator">
-        <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;"
-            data-question-id="{{ question['_id'] }}">
-            👍<span id="like-count">{{ like_count }}</span>
+        <button id="like-button" class="like-button button is-white" data-question-id="{{ question['_id'] }}">
+            <i class="fas fa-solid fa-heart"></i><span id="like-count"> {{ like_count }}</span>
         </button>
-        <span>🖱️<span id="click-count">{{ click_count }}</span></span>
+        <div class="invitor_count">
+            <i class="fas fa-solid fa-users"></i><span id="click-count">{{ click_count }}</span>
+        </div>
     </div>
 </section>
 

@@ -254,11 +254,9 @@ def question(question_id):
         token = session.get('token')
 
     question_data = db.questions.find_one({'_id': ObjectId(question_id)})
-    print(question_data)
     if not question_data:
         return jsonify({'error': 'Question not found'}), 404
     member_data = db.Member.find_one({'_id': question_data['member_id']})
-    print(member_data)
     if not member_data:
         return jsonify({'error': 'Member not found'}), 404
     like_count = Like_collection.count_documents({'question_id': ObjectId(question_id)})
@@ -271,8 +269,6 @@ def question(question_id):
             current_user = Member_collection.find_one({'id': data['user']})
             if current_user:
                 check_data = db.check.find_one({'member_id': current_user['_id'], 'question_id': ObjectId(question_id)})
-                if not check_data:
-                    return jsonify({'error': 'Question Check Data not found'}), 404
 
                 return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count, current_user=current_user)
 
@@ -287,46 +283,91 @@ def question(question_id):
 
 # 좋아요 수 증가 및 취소 라우트
 @app.route('/increment_like', methods=['POST'])
-@token_required
-def increment_like(current_user):
+def increment_like():
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
+
+
     question_id = request.form['question_id']
     question_obj_id = ObjectId(question_id)
-
-    # 좋아요 기록을 like 컬렉션에 삽입
-    like_record = {
-        'member_id': current_user['_id'],
-        'question_id': question_obj_id
-    }
-    # 중복 좋아요 방지
-    existing_like = Like_collection.find_one({'member_id': current_user['_id'], 'question_id': question_obj_id})
-    if existing_like:
-        Like_collection.delete_one({'_id': existing_like['_id']})
-        action = "unliked"
-    else:
-        Like_collection.insert_one(like_record)
-        action = "liked"
-
-    # 해당 질문의 좋아요 수 계산
     like_count = Like_collection.count_documents({'question_id': question_obj_id})
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
 
-    return jsonify({'like_count': like_count, 'action': action})
+            # 좋아요 기록을 like 컬렉션에 삽입
+            like_record = {
+                'member_id': current_user['_id'],
+                'question_id': question_obj_id
+            }
+            # 중복 좋아요 방지
+            existing_like = Like_collection.find_one({'member_id': current_user['_id'], 'question_id': question_obj_id})
+            if existing_like:
+                Like_collection.delete_one({'_id': existing_like['_id']})
+                action = "unliked"
+            else:
+                Like_collection.insert_one(like_record)
+                action = "liked"
 
-# 클릭 수 증가 라우트
-@app.route('/increment_click', methods=['POST'])
-@token_required
-def increment_click(current_user):
-    question_id = request.form['question_id']
-    question_obj_id = ObjectId(question_id)
-    
-    # 해당 질문의 응답 수 계산
-    participant_count = db.check.count_documents({'question_id': question_obj_id})
+            # 해당 질문의 좋아요 수 계산
 
-    return jsonify({'participant_count': participant_count})
+            if current_user:
+                return jsonify({'result': 'success', 'like_count': like_count, 'action': action})
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    return jsonify({'result': 'fail', 'like_count': None, 'action': None})
+
+
+
+
+
+    return jsonify({'result': 'success', 'like_count': like_count, 'action': action})
+
 
 # 댓글 등록
 @app.route('/api/question/comment', methods=['POST'])
-@token_required
-def createComment(current_user):
+def createComment():
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
+
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
+
+            questionId = ObjectId(request.form['questionId'])
+            memberId = current_user['_id']
+            member_data = db.Member.find_one({'_id': memberId})
+            writer = member_data['nickname']
+            content = request.form['content']
+            content_data = {
+                'question_id': questionId,
+                'member_id': memberId,
+                'nickname': writer,
+                'created_at': datetime.datetime.now(),
+                'content': content
+            }
+            db.comment.insert_one(content_data)
+            if current_user:
+                return jsonify({'result': 'success', 'msg': '댓글 등록 완료!'})
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    return jsonify({'result': 'fail', 'msg': '댓글 등록 실패!'})
+
+
     questionId = ObjectId(request.form['questionId'])
     memberId = current_user['_id']
     member_data = db.Member.find_one({'_id': memberId})
@@ -336,7 +377,7 @@ def createComment(current_user):
         'question_id': questionId,
         'member_id': memberId,
         'nickname': writer,
-        'created_at': datetime.datetime.now().strftime('%Y.%m.%d. %H:%M'),
+        'created_at': datetime.datetime.now(),
         'content': content
     }
     db.comment.insert_one(data)
@@ -370,7 +411,7 @@ def createQuestion(current_user):
         category = request.form['category']
         question1 = request.form['question1']
         question2 = request.form['question2']
-        createdAt = datetime.datetime.now().strftime('%Y.%m.%d. %H:%M')
+        createdAt = datetime.datetime.now()
 
         data = {
             'member_id': memberId,
@@ -388,31 +429,53 @@ def createQuestion(current_user):
 
 # 질문 선택
 @app.route('/api/question/<question_id>/click', methods=['POST'])
-@token_required
-def clickQuestion(current_user, question_id):
-    memberId = current_user['_id']
-    questionId = ObjectId(question_id)
-    check = request.form['questionNum']
+def clickQuestion(question_id):
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
 
-    findData = {
-        'member_id': memberId,
-        'question_id': questionId
-    }
-    checkData = db.check.find_one(findData)
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
 
-    data = {
-        'member_id': memberId,
-        'question_id': questionId,
-        'check': check
-    }
-    if not checkData:
-        db.check.insert_one(data)
-        return jsonify({'result': 'success', 'msg': '질문 선택 완료!'})
-    elif check != checkData['check']:
-        db.check.update_one(findData, {'$set': {'check': check}})
-        return jsonify({'result': 'success', 'msg': '질문 선택 변경 완료!'})
-    else:
-        return jsonify({'result': 'success', 'msg': '질문 선택 유지'})
+            memberId = current_user['_id']
+            questionId = ObjectId(question_id)
+            check = request.form['questionNum']
+
+            findData = {
+                'member_id': memberId,
+                'question_id': questionId
+            }
+            checkData = db.check.find_one(findData)
+
+            data = {
+                'member_id': memberId,
+                'question_id': questionId,
+                'check': check
+            }
+            if current_user:
+                if not checkData:
+                    db.check.insert_one(data)
+                    # 해당 질문의 응답 수 계산
+                    participant_count = db.check.count_documents({'question_id': questionId})
+                    return jsonify({'result': 'success', 'msg': '질문 선택 완료!', 'participant_count': participant_count})
+                elif check != checkData['check']:
+                    participant_count = db.check.count_documents({'question_id': questionId})
+                    db.check.update_one(findData, {'$set': {'check': check}})
+                    return jsonify({'result': 'success', 'msg': '질문 선택 변경 완료!', 'participant_count': participant_count})
+                else:
+                    participant_count = db.check.count_documents({'question_id': questionId})
+                    return jsonify({'result': 'success', 'msg': '질문 선택 유지', 'participant_count': participant_count})
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    return jsonify({'result': 'fail', 'msg': '질문 선택 실패'})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
