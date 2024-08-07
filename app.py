@@ -290,7 +290,6 @@ def increment_like():
     elif 'token' in session:
         token = session.get('token')
 
-
     question_id = request.form['question_id']
     question_obj_id = ObjectId(question_id)
     like_count = Like_collection.count_documents({'question_id': question_obj_id})
