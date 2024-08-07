@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
-    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/base.css">
     <link rel="stylesheet" href="../static/css/newQuestion.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -16,9 +16,6 @@
             let category = $('.select select').val();
             let question1 = $('.new-question-section .input').eq(0).val();
             let question2 = $('.new-question-section .input').eq(1).val();
-            console.log('카테고리:', category);
-            console.log('질문 1:', question1);
-            console.log('질문 2:', question2);
 
             // 세션에 저장된 토큰 가져오기
             let token = sessionStorage.getItem('token');
@@ -66,21 +63,37 @@
     <title>질문 등록</title>
 </head>
 <body>
+
+<!-- 헤더 -->
 <header>
     <nav id="top-nav" role="navigation" class="is-white">
         <div class="nav-logo">
-            <a class="navbar-item" href="/static">
+            <a class="navbar-item" href="/">
                 <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
             </a>
         </div>
-
         <div class="nav-main">
             <div class="field is-grouped">
-                <button class="button">로그인</button>
+                {% if session.get('token') %}
+                    <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                        <button class="button">로그아웃</button>
+                    </form>
+                    <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
+                {% else %}
+                    <a class="button" href="{{ url_for('login') }}">로그인</a>
+                {% endif %}
             </div>
         </div>
     </nav>
+
+    <section class="hero is-success">
+        <div class="hero-body center">
+            <p class="title">정글 밸런스 게임</p>
+            <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+        </div>
+    </section>
 </header>
+
 <div class="divider"></div>
 
 <div class="wrap">

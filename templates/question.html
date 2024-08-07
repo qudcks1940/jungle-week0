@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
-    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/base.css">
     <link rel="stylesheet" href="../static/css/question.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,33 +48,113 @@
                 });
             });
         });
+
+        function question1() {
+            let url = window.location.pathname;
+            let question_id = url.split('/').pop();
+            $.ajax({
+                url: `/api/question/${question_id}/click`,
+                type: "POST",
+                data: {
+                    "questionNum": 1
+                },
+                success: function(response) {
+                    console.log(response['msg']);
+                    question_refresh();
+                },
+                error: function(error) {
+                    if (response['result'] == 'success') {
+                        console.log(response['msg']);
+                        question_refresh(1);
+                    }
+                }
+            });
+        }
+
+        function question2() {
+            let url = window.location.pathname;
+            let question_id = url.split('/').pop();
+            $.ajax({
+                url: `/api/question/${question_id}/click`,
+                type: "POST",
+                data: {
+                    "questionNum": 2
+                },
+                success: function(response) {
+                    if (response['result'] == 'success') {
+                        console.log(response['msg']);
+                        question_refresh(2);
+                    }
+                },
+                error: function(error) {
+                    console.log("Error:", error);
+                }
+            });
+        }
+
+        function question_refresh(checkNum) {
+            $('.question-box').empty();
+            let select1 = '';
+            let select2 = '';
+            if (checkNum == 1) {
+                select1 = 'question-select';
+            } else {
+                select2 = 'question-select';
+            }
+            let temp_html = `
+                <div class="button-box ${select1}">
+                    <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
+                </div>
+                <div class="versus">
+                    <span class="versus-v">V</span>
+                    <span class="versus-s">S</span>
+                </div>
+                    <div class="button-box ${select2}">
+                    <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
+                </div>
+            `
+            $('.question-box').append(temp_html);
+        }
+
+
     </script>
 </head>
 <body>
+
+<!-- 헤더 -->
 <header>
     <nav id="top-nav" role="navigation" class="is-white">
         <div class="nav-logo">
-            <a class="navbar-item" href="/static">
+            <a class="navbar-item" href="/">
                 <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
             </a>
         </div>
         <div class="nav-main">
             <div class="field is-grouped">
-                <button class="button">로그인</button>
+                {% if session.get('token') %}
+                    <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                        <button class="button">로그아웃</button>
+                    </form>
+                    <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
+                {% else %}
+                    <a class="button" href="{{ url_for('login') }}">로그인</a>
+                {% endif %}
             </div>
         </div>
     </nav>
-    <section class="hero is-success banner">
+
+    <section class="hero is-success">
         <div class="hero-body center">
             <p class="title">정글 밸런스 게임</p>
             <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
         </div>
     </section>
 </header>
+
 <section class="question-info">
     <div class="question-maker-info">
-        <span class="tag is-link is-light">치키차카</span>
-        <span class="created-at">2024.08.06. 14:30</span>
+        <span class="tag is-link is-light">{{ member['nickname'] }}</span>
+        <span class="created-at">{{ question['created_at'] }}</span>
     </div>
     <div class="question-indicator">
         <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;">
@@ -85,15 +165,23 @@
     </div>
 </section>
 <section class="question-box lr-align">
+    {% if check['check'] == 1 %}
     <div class="button-box question-select">
-        <button class="button question">Success</button>
+    {% else %}
+    <div class="button-box">
+    {% endif %}
+        <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
     </div>
     <div class="versus">
         <span class="versus-v">V</span>
         <span class="versus-s">S</span>
     </div>
-    <div class="button-box">
-        <button class="button question">Success</button>
+    {% if check['check'] == 2 %}
+        <div class="button-box question-select">
+    {% else %}
+        <div class="button-box">
+    {% endif %}
+        <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
     </div>
 </section>
 
