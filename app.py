@@ -190,11 +190,11 @@ def logout():
 def question(question_id):
     question_data = db.questions.find_one({'_id': ObjectId(question_id)})
     member_data = db.Member.find_one({'_id': question_data['member_id']})
+    check_data = db.check.find_one({'member_id': question_data['member_id'], 'questionId': question_id})
     if not question_data:
         return jsonify({'error': 'Question not found'}), 404
     if not member_data:
         return jsonify({'error': 'Member not found'}), 404
-    print(question_data)
 
     if 'like_count' not in session:
         session['like_count'] = 10  # 기본 좋아요 수
@@ -203,7 +203,7 @@ def question(question_id):
     if 'comments' not in session:
         session['comments'] = []
     comments = session['comments']
-    return render_template('question.html', like_count=session['like_count'], click_count=session['click_count'], comments=comments, question=question_data, member=member_data)
+    return render_template('question.html', like_count=session['like_count'], click_count=session['click_count'], comments=comments, question=question_data, member=member_data, check=check_data)
 
 # 좋아요 수 증가 라우트
 @app.route('/increment_like', methods=['POST'])
@@ -241,13 +241,14 @@ def add_comment(current_user):
 @token_required
 def createQuestion(current_user):
     try:
+        memberId = current_user['_id']
         category = request.form['category']
         question1 = request.form['question1']
         question2 = request.form['question2']
         createdAt = datetime.datetime.now().strftime('%Y.%m.%d. %H:%M')
 
         data = {
-            'member_id': current_user['_id'],
+            'member_id': memberId,
             'created_at': createdAt,
             'category': category,
             'question1': question1,
@@ -259,6 +260,39 @@ def createQuestion(current_user):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'result': 'fail', 'msg': '질문 등록 실패!'}), 500
+
+# 질문 선택
+@app.route('/api/question/<question_id>/click', methods=['POST'])
+@token_required
+def clickQuestion(current_user, question_id):
+    memberId = current_user['_id']
+    questionId = question_id
+    check = request.form['questionNum']
+
+    findData = {
+        'member_id': memberId,
+        'question_id': questionId
+    }
+    checkData = db.check.find_one(findData)
+
+    data = {
+        'member_id': memberId,
+        'question_id': questionId,
+        'check': check
+    }
+    if not checkData:
+        db.check.insert_one(data)
+        return jsonify({'result': 'success', 'msg': '질문 선택 완료!'})
+
+    elif check != checkData['check']:
+        db.check.update_one(findData, {'$set': {'check': check}})
+        return jsonify({'result': 'success', 'msg': '질문 선택 변경 완료!'})
+
+    else:
+        return jsonify({'result': 'success', 'msg': '질문 선택 유지'})
+
+
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)

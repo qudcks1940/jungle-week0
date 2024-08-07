@@ -48,6 +48,75 @@
                 });
             });
         });
+
+        function question1() {
+            let url = window.location.pathname;
+            let question_id = url.split('/').pop();
+            $.ajax({
+                url: `/api/question/${question_id}/click`,
+                type: "POST",
+                data: {
+                    "questionNum": 1
+                },
+                success: function(response) {
+                    console.log(response['msg']);
+                    question_refresh();
+                },
+                error: function(error) {
+                    if (response['result'] == 'success') {
+                        console.log(response['msg']);
+                        question_refresh(1);
+                    }
+                }
+            });
+        }
+
+        function question2() {
+            let url = window.location.pathname;
+            let question_id = url.split('/').pop();
+            $.ajax({
+                url: `/api/question/${question_id}/click`,
+                type: "POST",
+                data: {
+                    "questionNum": 2
+                },
+                success: function(response) {
+                    if (response['result'] == 'success') {
+                        console.log(response['msg']);
+                        question_refresh(2);
+                    }
+                },
+                error: function(error) {
+                    console.log("Error:", error);
+                }
+            });
+        }
+
+        function question_refresh(checkNum) {
+            $('.question-box').empty();
+            let select1 = '';
+            let select2 = '';
+            if (checkNum == 1) {
+                select1 = 'question-select';
+            } else {
+                select2 = 'question-select';
+            }
+            let temp_html = `
+                <div class="button-box ${select1}">
+                    <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
+                </div>
+                <div class="versus">
+                    <span class="versus-v">V</span>
+                    <span class="versus-s">S</span>
+                </div>
+                    <div class="button-box ${select2}">
+                    <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
+                </div>
+            `
+            $('.question-box').append(temp_html);
+        }
+
+
     </script>
 </head>
 <body>
@@ -96,15 +165,23 @@
     </div>
 </section>
 <section class="question-box lr-align">
+    {% if check['check'] == 1 %}
     <div class="button-box question-select">
-        <button class="button question">{{ question['question1'] }}</button>
+    {% else %}
+    <div class="button-box">
+    {% endif %}
+        <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
     </div>
     <div class="versus">
         <span class="versus-v">V</span>
         <span class="versus-s">S</span>
     </div>
-    <div class="button-box">
-        <button class="button question">{{ question['question2'] }}</button>
+    {% if check['check'] == 2 %}
+        <div class="button-box question-select">
+    {% else %}
+        <div class="button-box">
+    {% endif %}
+        <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
     </div>
 </section>
 
