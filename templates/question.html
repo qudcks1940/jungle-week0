@@ -163,49 +163,53 @@
                     if (response['result'] == 'success') {
                         $('.comment-list-area').empty()
                         let commentList = response['commentList'];
+                        let currentUserId = "{{ current_user['_id'] }}";  // 현재 로그인한 사용자의 ID
                         for (let i = 0; i < commentList.length; i++) {
                             let comment = commentList[i];
                             let commentId = comment['_id'];
                             let writer = comment['nickname'];
                             let createdAt = comment['created_at'];
                             let content = comment['content'];
+                            let isOwner = comment['member_id'] === currentUserId;  // 작성자와 로그인한 사용자 비교
                             let temp_html = `
-                                <div class="comment-area">
-                                    <input class="comment-id" type="hidden" value="${commentId}">
+                            <div class="comment-area">
+                                <input class="comment-id" type="hidden" value="${commentId}">
 
-                                    <!-- 기본 상태 -->
-                                    <div class="comment-default-form" style="display: block;">
-                                        <div class="comment-box">
-                                            <div class="comment-nickname">
-                                                <span class="tag is-link is-light">${writer}</span>
-                                                <p class="created-at">${createdAt}</p>
-                                            </div>
-                                            <div class="comment-text">
-                                                <p>${content}</p>
-                                            </div>
+                                <!-- 기본 상태 -->
+                                <div class="comment-default-form" style="display: block;">
+                                    <div class="comment-box">
+                                        <div class="comment-nickname">
+                                            <span class="tag is-link is-light">${writer}</span>
+                                            <p class="created-at">${createdAt}</p>
                                         </div>
-                                        <div class="comment-btn">
-                                            <button onclick="updateForm(this)" class="button is-small comment-update">수정</button>
-                                            <button onclick="deleteComment(this)" class="button is-small is-danger  is-light comment-delete">삭제</button>
+                                        <div class="comment-text">
+                                            <p>${content}</p>
                                         </div>
                                     </div>
-
-                                    <!-- 수정 상태 -->
-                                    <div class="comment-update-form" style="display: none;">
-                                        <div class="comment-box">
-                                            <div class="comment-nickname">
-                                                <span class="tag is-link is-light">${writer}</span>
-                                                <p class="created-at">${createdAt}</p>
-                                            </div>
-                                            <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요">${content}</textarea>
-                                        </div>
-                                        <div class="comment-btn">
-                                            <button onclick="updateComment(this)" class="button is-small is-link is-light comment-update">수정</button>
-                                            <button onclick="defualtForm(this)" class="button is-small comment-delete">취소</button>
-                                        </div>
-                                    </div>
+                                    ${isOwner ? `
+                                    <div class="comment-btn">
+                                        <button onclick="updateForm(this)" class="button is-small comment-update">수정</button>
+                                        <button onclick="deleteComment(this)" class="button is-small is-danger  is-light comment-delete">삭제</button>
+                                    </div>` : ''}
                                 </div>
-                            `
+
+                                <!-- 수정 상태 -->
+                                ${isOwner ? `
+                                <div class="comment-update-form" style="display: none;">
+                                    <div class="comment-box">
+                                        <div class="comment-nickname">
+                                            <span class="tag is-link is-light">${writer}</span>
+                                            <p class="created-at">${createdAt}</p>
+                                        </div>
+                                        <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요">${content}</textarea>
+                                    </div>
+                                    <div class="comment-btn">
+                                        <button onclick="updateComment(this)" class="button is-small is-link is-light comment-update">수정</button>
+                                        <button onclick="defualtForm(this)" class="button is-small comment-delete">취소</button>
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        `;
                             $('.comment-list-area').append(temp_html);
                         }
                     }
@@ -213,7 +217,7 @@
             });
         }
 
-        function createComment() {
+        function addComment() {
             let content = $('.comment-input textarea').val();
             let url = window.location.pathname;
             let question_id = url.split('/').pop();
@@ -226,7 +230,7 @@
                 },
                 success: function (response) {
                     if (response['result'] == 'success') {
-                        showComments()
+                        showComments();
                     }
                 }
             });
@@ -244,7 +248,7 @@
                 success: function (response) {
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
-                        showComments()
+                        showComments();
                     }
                 }
             });
@@ -258,7 +262,7 @@
                 success: function (response) {
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
-                        showComments()
+                        showComments();
                     }
                 }
             });
@@ -280,69 +284,69 @@
 </head>
 
 <body>
-    <header>
-        <nav id="top-nav" role="navigation" class="is-white">
-            <div class="nav-logo">
-                <a class="navbar-item" href="/">
-                    <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
-                </a>
-            </div>
-            <div class="nav-main">
-                <div class="field is-grouped">
-                    {% if session.get('token') %}
-                    <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
-                        <button class="button">로그아웃</button>
-                    </form>
-                    <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
-                    {% else %}
-                    <a class="button" href="{{ url_for('login') }}">로그인</a>
-                    {% endif %}
-                </div>
-            </div>
-        </nav>
-
-        <section class="hero is-success">
-            <div class="hero-body center">
-                <p class="title">정글 밸런스 게임</p>
-                <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
-            </div>
-        </section>
-    </header>
-
-    <section class="question-info">
-        <div class="question-maker-info">
-            <span class="tag is-link is-light">{{ member['nickname'] }}</span>
-            <span class="created-at">{{ question['created_at'] }}</span>
+<header>
+    <nav id="top-nav" role="navigation" class="is-white">
+        <div class="nav-logo">
+            <a class="navbar-item" href="/">
+                <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
+            </a>
         </div>
-        <div class="question-indicator">
-            <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;"
-                data-question-id="{{ question['_id'] }}">
-                👍<span id="like-count">{{ like_count }}</span>
-            </button>
-            <span>🖱️<span id="click-count">{{ click_count }}</span></span>
-        </div>
-    </section>
-    <section class="question-box lr-align">
-        {% if check['check'] == '1' %}
-        <div class="button-box question-select">
-            {% else %}
-            <div class="button-box">
-                {% endif %}
-                <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
-            </div>
-            <div class="versus">
-                <span class="versus-v">V</span>
-                <span class="versus-s">S</span>
-            </div>
-            {% if check['check'] == '2' %}
-            <div class="button-box question-select">
+        <div class="nav-main">
+            <div class="field is-grouped">
+                {% if session.get('token') %}
+                <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                    <button class="button">로그아웃</button>
+                </form>
+                <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
                 {% else %}
-                <div class="button-box">
-                    {% endif %}
-                    <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
-                </div>
-    </section>
+                <a class="button" href="{{ url_for('login') }}">로그인</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
 
+    <section class="hero is-success">
+        <div class="hero-body center">
+            <p class="title">정글 밸런스 게임</p>
+            <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+        </div>
+    </section>
+</header>
+
+<section class="question-info">
+    <div class="question-maker-info">
+        <span class="tag is-link is-light">{{ member['nickname'] }}</span>
+        <span class="created-at">{{ question['created_at'] }}</span>
+    </div>
+    <div class="question-indicator">
+        <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;"
+            data-question-id="{{ question['_id'] }}">
+            👍<span id="like-count">{{ like_count }}</span>
+        </button>
+        <span>🖱️<span id="click-count">{{ click_count }}</span></span>
+    </div>
+</section>
+
+<section class="question-box lr-align">
+    {% if check['check'] == '1' %}
+    <div class="button-box question-select">
+    {% else %}
+    <div class="button-box">
+    {% endif %}
+        <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
+    </div>
+    <div class="versus">
+        <span class="versus-v">V</span>
+        <span class="versus-s">S</span>
+    </div>
+    {% if check['check'] == '2' %}
+    <div class="button-box question-select">
+    {% else %}
+    <div class="button-box">
+    {% endif %}
+        <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
+    </div>
+</section>
 
 <!-- 댓글 개수를 표시하는 부분 -->
 <span class="comment-count tag is-black">댓글 {{ commentCount }}개</span>
@@ -350,7 +354,7 @@
 <section class="comment-input">
     <textarea  class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요"></textarea>
     <div class="button-right-align">
-        <button onclick="createComment()" class="button is-success is-light" type="submit">댓글 등록</button>
+        <button onclick="addComment()" class="button is-success is-light">댓글 등록</button>
     </div>
 </section>
 <section class="comment-list-area">
