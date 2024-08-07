@@ -1,0 +1,51 @@
+/* 카테고리 선택 관련 디자인 */
+.category-card-wrapper {
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.wrap-title {
+    padding: 1rem 0.4rem;
+}
+
+.category-card:hover {
+    background-color: aquamarine;
+}
+
+.category-card.active {
+    background-color: aquamarine;
+}
+
+.category-card-height {
+    height: 100%;
+}
+
+/* 필터 메뉴 관련 디자인 */
+#sub-nav {
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+/* 밸런스 게임 질문 관련 디자인 */
+.question-card-wrap {
+    padding: 10px;
+}
+
+.question-card {
+    margin-top: 1rem;
+}
+
+.question-card-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.count-group {
+    display: flex;
+}
+
+.q-info {
+    margin-right: 10px;
+}
