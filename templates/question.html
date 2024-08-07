@@ -2,8 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
     <link rel="stylesheet" href="../static/css/base.css">
@@ -19,12 +18,19 @@
     <script>
         $(document).ready(function(){
             $('#like-button').click(function(){
+                let questionId = $(this).data('question-id');
                 $.ajax({
                     url: "{{ url_for('increment_like') }}",
                     type: "POST",
+                    data: { question_id: questionId },
                     success: function(response) {
                         if (response.like_count !== undefined) {
                             $('#like-count').text(response.like_count);
+                            if (response.action === "liked") {
+                                $('#like-button').addClass('liked');
+                            } else {
+                                $('#like-button').removeClass('liked');
+                            }
                         }
                     },
                     error: function(error) {
@@ -135,13 +141,9 @@
             `
             $('.question-box').append(temp_html);
         }
-
-
     </script>
 </head>
 <body>
-
-<!-- 헤더 -->
 <header>
     <nav id="top-nav" role="navigation" class="is-white">
         <div class="nav-logo">
@@ -177,7 +179,7 @@
         <span class="created-at">{{ question['created_at'] }}</span>
     </div>
     <div class="question-indicator">
-        <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;">
+        <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;" data-question-id="{{ question['_id'] }}">
             👍<span id="like-count">{{ like_count }}</span>
         </button>
         <span>💬<span id="comment-count">{{ comments|length }}</span></span>

@@ -16,6 +16,7 @@ app = Flask(__name__)
 client = MongoClient('mongodb+srv://sparta:jungle@cluster0.b3sejq0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 db = client['balancegamedb']
 Member_collection = db['Member']
+Like_collection = db['likes']  # Like 컬렉션 추가
 
 #######################################################################
 # MongoDB 조회 결과를 jsonify 메서드를 통해 JSON으로 만들 때
@@ -122,14 +123,14 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_id = request.form['id']
+        member_id = request.form['id']
         password = request.form['password']
 
-        user = Member_collection.find_one({'id': user_id})
+        user = Member_collection.find_one({'id': member_id})
 
         if user and check_password_hash(user['password'], password):
             token = jwt.encode({
-                'user': user_id,
+                'user': member_id,
                 'exp': datetime.datetime.now() + datetime.timedelta(minutes=30)
             }, app.secret_key, algorithm="HS256")
             session['token'] = token
@@ -143,19 +144,19 @@ def login():
 def register():
     if request.method == 'POST':
         nickname = request.form['nickname']
-        user_id = request.form['id']
+        member_id = request.form['id']
         password = request.form['password']
         birthday = request.form['birthday']
         gender = request.form['gender']
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
 
-        existing_user = Member_collection.find_one({'id': user_id})
+        existing_user = Member_collection.find_one({'id': member_id})
         if existing_user:
             return render_template('register.html', message="User already exists", error=True)
 
         Member_collection.insert_one({
             'nickname': nickname,
-            'id': user_id,
+            'id': member_id,
             'password': hashed_password,
             'birthday': birthday,
             'gender': gender,
@@ -200,22 +201,37 @@ def question(current_user, question_id):
     if not member_data:
         return jsonify({'error': 'Member not found'}), 404
 
-    if 'like_count' not in session:
-        session['like_count'] = 10  # 기본 좋아요 수
-    if 'click_count' not in session:
-        session['click_count'] = 10  # 기본 클릭 수
-    if 'comments' not in session:
-        session['comments'] = []
-    comments = session['comments']
-    return render_template('question.html', like_count=session['like_count'], click_count=session['click_count'], comments=comments, question=question_data, member=member_data, check=check_data)
+    like_count = Like_collection.count_documents({'question_id': ObjectId(question_id)})
+    comments = session.get('comments', [])
+    click_count = session.get('click_count', 10)  # 기본 클릭 수
+    
+    return render_template('question.html', like_count=like_count, click_count=click_count, comments=comments, question=question_data, member=member_data, check=check_data)
 
-# 좋아요 수 증가 라우트
+# 좋아요 수 증가 및 취소 라우트
 @app.route('/increment_like', methods=['POST'])
-def increment_like():
-    if 'like_count' in session:
-        session['like_count'] += 1
-        return jsonify({'like_count': session['like_count']})
-    return jsonify({'error': 'Like count not found'}), 400
+@token_required
+def increment_like(current_user):
+    question_id = request.form['question_id']
+    question_obj_id = ObjectId(question_id)
+
+    # 좋아요 기록을 like 컬렉션에 삽입
+    like_record = {
+        'member_id': current_user['_id'],
+        'question_id': question_obj_id
+    }
+    # 중복 좋아요 방지
+    existing_like = Like_collection.find_one({'member_id': current_user['_id'], 'question_id': question_obj_id})
+    if existing_like:
+        Like_collection.delete_one({'_id': existing_like['_id']})
+        action = "unliked"
+    else:
+        Like_collection.insert_one(like_record)
+        action = "liked"
+
+    # 해당 질문의 좋아요 수 계산
+    like_count = Like_collection.count_documents({'question_id': question_obj_id})
+
+    return jsonify({'like_count': like_count, 'action': action})
 
 # 클릭 수 증가 라우트
 @app.route('/increment_click', methods=['POST'])
