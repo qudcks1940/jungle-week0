@@ -19,9 +19,12 @@
     <script>
         $(document).ready(function(){
             $('#like-button').click(function(){
+                var questionId = $(this).data('question-id');
                 $.ajax({
                     url: "{{ url_for('increment_like') }}",
                     type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({question_id: questionId}),
                     success: function(response) {
                         if (response.like_count !== undefined) {
                             $('#like-count').text(response.like_count);
@@ -60,7 +63,14 @@
         </div>
         <div class="nav-main">
             <div class="field is-grouped">
-                <button class="button">로그인</button>
+                {% if session.get('token') %}
+                    <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                        <button class="button">로그아웃</button>
+                    </form>
+                    <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
+                {% else %}
+                    <a class="button" href="{{ url_for('login') }}">로그인</a>
+                {% endif %}
             </div>
         </div>
     </nav>
