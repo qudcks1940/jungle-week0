@@ -7,18 +7,66 @@ from functools import wraps
 from dotenv import load_dotenv
 import os
 
+app = Flask(__name__)
+
+# MongoDB 설정
+client = MongoClient('mongodb+srv://chris309804:1234@cluster0.z80vjt6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+db = client['balancegamedb']
+Member_collection = db['Member']
+
+#######################################################################
+# MongoDB 조회 결과를 jsonify 메서드를 통해 JSON으로 만들 때 
+# MongoDB의 ObjectId를 파이썬의 문자열 타입으로 변환해주는 부분
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        if isinstance(o, datetime.datetime):
+            return o.strftime('%Y년 %m월 %d일 %H시 %M분')
+        return json.JSONEncoder.default(self, o)
+
+
+class CustomJSONProvider(JSONProvider):
+    def dumps(self, obj, **kwargs):
+        return json.dumps(obj, **kwargs, cls=CustomJSONEncoder)
+
+    def loads(self, s, **kwargs):
+        return json.loads(s, **kwargs)
+
+app.json = CustomJSONProvider(app)
+#######################################################################
+
+@app.route('/home')
+def home():
+    return render_template('index.html')
+
+@app.route('/api/question/list', methods=['GET'])
+def list_question():
+
+    category_mode = request.args.get('category_mode', 'life')
+    sort_mode = request.args.get('sortMode', 'likes') # 기본 정렬 값: 좋아요 순
+    is_desc = -1                                      # 기본 정렬 방향: 내림차순
+    questions = db.questions.find({}, { 'category' : category_mode }).sort({ sort_mode: is_desc })
+
+    return render_template('index.html')
+
+# @app.route('/api/question/like', methods=['POST'])
+# def like_question():
+#     id_receive = request.form['id_give']
+#     current_likes = db.memos.find_one({'_id': ObjectId(id_receive)})['likes']
+#     new_likes = current_likes + 1
+#     db.questions.update_one({'_id': ObjectId(id_receive)}, {'$set': {'likes': new_likes}})
+#     return jsonify({ 'result': 'success' })
+
 # .env 파일 로드
+
 load_dotenv()
 
 app = Flask(__name__)
 
 # 환경 변수에서 secret key 로드
+print(os.getenv('SECRET_KEY'))
 app.secret_key = os.getenv('SECRET_KEY')
-
-# MongoDB 설정
-client = MongoClient('mongodb://localhost:27017/')
-db = client['balancegamedb']
-Member_collection = db['Member']
 
 # 사용자명(id)에 대한 고유 인덱스 생성
 Member_collection.create_index('id', unique=True)
@@ -45,7 +93,6 @@ def token_required(f):
             return jsonify({'message': 'Token is invalid!'}), 401
         return f(current_user, *args, **kwargs)
     return decorated
-
 
 # 홈 페이지
 @app.route('/')
@@ -118,7 +165,7 @@ def logout():
     session.pop('token', None)
     flash('You have successfully logged out', 'success')
     return redirect(url_for('home'))
-
+  
 # 질문 페이지
 @app.route('/question', methods=['GET'])
 def question():
@@ -144,5 +191,26 @@ def increment_click():
         return jsonify({'click_count': session['click_count']})
     return jsonify({'error': 'Click count not found'}), 400
 
+# 질문 등록
+@app.route('/api/question', methods=['POST'])
+def createQuestion(current_user):
+    memberId = current_user['_id']
+    category = request.form['category']
+    question1 = request.form['question1']
+    question2 = request.form['question2']
+    createdAt = datetime.now()
+
+    data = {
+        'member_id': memberId,
+        'created_at': createdAt,
+        'category': category,
+        'question1': question1,
+        'question2': question2,
+    }
+    print(data)
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!'})
+
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
+

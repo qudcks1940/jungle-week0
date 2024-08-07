@@ -1,0 +1,28 @@
+body {
+    max-width: 1000px;
+    margin: auto;
+    padding: 0 15px;
+}
+
+header>#top-nav {
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+header>#top-nav {
+    margin-top: 5px;
+}
+
+.nav-main {
+    display: flex;
+}
+
+.banner {
+    margin-top: 5px;
+}
+
+.center {
+    text-align: center;
+}
