@@ -1,10 +1,12 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
     <link rel="stylesheet" href="../static/css/base.css">
     <link rel="stylesheet" href="../static/css/question.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,14 +18,14 @@
     <title>질문</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function(){
-            $('#like-button').click(function(){
+        $(document).ready(function () {
+            $('#like-button').click(function () {
                 let questionId = $(this).data('question-id');
                 $.ajax({
                     url: "{{ url_for('increment_like') }}",
                     type: "POST",
                     data: { question_id: questionId },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.like_count !== undefined) {
                             $('#like-count').text(response.like_count);
                             if (response.action === "liked") {
@@ -33,22 +35,27 @@
                             }
                         }
                     },
-                    error: function(error) {
+                    error: function (error) {
                         console.log("Error:", error);
                     }
                 });
             });
 
-            $('.question').click(function(){
+            $('.question').click(function () {
+                let questionId = $(this).data('question-id');
+                let checkValue = $(this).data('check');  // 버튼의 체크 값 가져오기
+
                 $.ajax({
                     url: "{{ url_for('increment_click') }}",
                     type: "POST",
-                    success: function(response) {
-                        if (response.click_count !== undefined) {
-                            $('#click-count').text(response.click_count);
+                    data: { question_id: questionId, check: checkValue },  // 데이터 전송
+                    success: function (response) {
+                        if (response.participant_count !== undefined) {
+                            location.reload();  // 새로고침
                         }
+                        console.log(response.msg); // 응답 메시지 출력
                     },
-                    error: function(error) {
+                    error: function (error) {
                         console.log("Error:", error);
                     }
                 });
@@ -64,26 +71,26 @@
                 data: {
                     "questionNum": 1
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
                         $('.question-box').empty();
                         let temp_html = `
                             <div class="button-box question-select">
-                                <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
+                                <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
                             </div>
                             <div class="versus">
                                 <span class="versus-v">V</span>
                                 <span class="versus-s">S</span>
                             </div>
                             <div class="button-box">
-                                <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
+                                <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
                             </div>
                         `
                         $('.question-box').append(temp_html);
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log("Error:", error);
                 }
             });
@@ -98,26 +105,26 @@
                 data: {
                     "questionNum": 2
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
                         $('.question-box').empty();
                         let temp_html = `
                             <div class="button-box">
-                                <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
+                                <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
                             </div>
                             <div class="versus">
                                 <span class="versus-v">V</span>
                                 <span class="versus-s">S</span>
                             </div>
                             <div class="button-box question-select">
-                                <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
+                                <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
                             </div>
                         `
                         $('.question-box').append(temp_html);
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log("Error:", error);
                 }
             });
@@ -128,7 +135,7 @@
             let temp_html = `
                 <div class="button-box question-select">
                 <div class="button-box">
-                    <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
+                    <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
                 </div>
                 <div class="versus">
                     <span class="versus-v">V</span>
@@ -136,104 +143,107 @@
                 </div>
                 <div class="button-box question-select">
                 <div class="button-box">
-                    <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
+                    <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
                 </div>
             `
             $('.question-box').append(temp_html);
         }
     </script>
 </head>
+
 <body>
-<header>
-    <nav id="top-nav" role="navigation" class="is-white">
-        <div class="nav-logo">
-            <a class="navbar-item" href="/">
-                <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
-            </a>
-        </div>
-        <div class="nav-main">
-            <div class="field is-grouped">
-                {% if session.get('token') %}
+    <header>
+        <nav id="top-nav" role="navigation" class="is-white">
+            <div class="nav-logo">
+                <a class="navbar-item" href="/">
+                    <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
+                </a>
+            </div>
+            <div class="nav-main">
+                <div class="field is-grouped">
+                    {% if session.get('token') %}
                     <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
                         <button class="button">로그아웃</button>
                     </form>
                     <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
-                {% else %}
+                    {% else %}
                     <a class="button" href="{{ url_for('login') }}">로그인</a>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <section class="hero is-success">
-        <div class="hero-body center">
-            <p class="title">정글 밸런스 게임</p>
-            <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+        <section class="hero is-success">
+            <div class="hero-body center">
+                <p class="title">정글 밸런스 게임</p>
+                <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+            </div>
+        </section>
+    </header>
+
+    <section class="question-info">
+        <div class="question-maker-info">
+            <span class="tag is-link is-light">{{ member['nickname'] }}</span>
+            <span class="created-at">{{ question['created_at'] }}</span>
+        </div>
+        <div class="question-indicator">
+            <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;"
+                data-question-id="{{ question['_id'] }}">
+                👍<span id="like-count">{{ like_count }}</span>
+            </button>
+            <span>💬<span id="comment-count">{{ comments|length }}</span></span>
+            <span>🖱️<span id="click-count">{{ click_count }}</span></span>
         </div>
     </section>
-</header>
+    <section class="question-box lr-align">
+        {% if check['check'] == '1' %}
+        <div class="button-box question-select">
+            {% else %}
+            <div class="button-box">
+                {% endif %}
+                <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
+            </div>
+            <div class="versus">
+                <span class="versus-v">V</span>
+                <span class="versus-s">S</span>
+            </div>
+            {% if check['check'] == '2' %}
+            <div class="button-box question-select">
+                {% else %}
+                <div class="button-box">
+                    {% endif %}
+                    <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
+                </div>
+    </section>
 
-<section class="question-info">
-    <div class="question-maker-info">
-        <span class="tag is-link is-light">{{ member['nickname'] }}</span>
-        <span class="created-at">{{ question['created_at'] }}</span>
-    </div>
-    <div class="question-indicator">
-        <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;" data-question-id="{{ question['_id'] }}">
-            👍<span id="like-count">{{ like_count }}</span>
-        </button>
-        <span>💬<span id="comment-count">{{ comments|length }}</span></span>
-        <span>🖱️<span id="click-count">{{ click_count }}</span></span>
-    </div>
-</section>
-<section class="question-box lr-align">
-    {% if check['check'] == '1' %}
-    <div class="button-box question-select">
-    {% else %}
-    <div class="button-box">
-    {% endif %}
-        <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
-    </div>
-    <div class="versus">
-        <span class="versus-v">V</span>
-        <span class="versus-s">S</span>
-    </div>
-    {% if check['check'] == '2' %}
-    <div class="button-box question-select">
-    {% else %}
-    <div class="button-box">
-    {% endif %}
-        <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
-    </div>
-</section>
+    <!-- 댓글 개수를 표시하는 부분 -->
+    <section class="comments-section">
+        <div class="comments-header">
+            <span>댓글 {{ comments|length }}개</span>
+        </div>
+    </section>
 
-<!-- 댓글 개수를 표시하는 부분 -->
-<section class="comments-section">
-    <div class="comments-header">
-        <span>댓글 {{ comments|length }}개</span>
-    </div>
-</section>
-
-<section class="comment-input">
-    <form action="{{ url_for('add_comment') }}" method="post">
-        <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요"></textarea>
-        <div class="button-right-align">
-            <button class="button is-success is-light" type="submit">댓글 등록</button>
+    <section class="comment-input">
+        <form action="{{ url_for('add_comment') }}" method="post">
+            <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요"></textarea>
+            <div class="button-right-align">
+                <button class="button is-success is-light" type="submit">댓글 등록</button>
+            </div>
+        </form>
+    </section>
+    <section>
+        {% for comment in comments %}
+        <div class="comment-box">
+            <div class="comment-nickname">
+                <span class="tag is-link is-light">{{ comment.nickname }}</span>
+                <p class="created-at">{{ comment.created_at }}</p>
+            </div>
+            <div class="comment-text">
+                <p>{{ comment.text }}</p>
+            </div>
         </div>
-    </form>
-</section>
-<section>
-    {% for comment in comments %}
-    <div class="comment-box">
-        <div class="comment-nickname">
-            <span class="tag is-link is-light">{{ comment.nickname }}</span>
-            <p class="created-at">{{ comment.created_at }}</p>
-        </div>
-        <div class="comment-text">
-            <p>{{ comment.text }}</p>
-        </div>
-    </div>
-    {% endfor %}
-</section>
+        {% endfor %}
+    </section>
 </body>
+
 </html>
