@@ -17,6 +17,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function(){
+            showComments();
+
             $('#like-button').click(function(){
                 let questionId = $(this).data('question-id');
                 $.ajax({
@@ -141,6 +143,67 @@
             `
             $('.question-box').append(temp_html);
         }
+
+        function showComments() {
+            $('.comment-input textarea').val('');
+            let url = window.location.pathname;
+            let question_id = url.split('/').pop();
+            $.ajax({
+                type: 'GET',
+                url: `/api/question/${question_id}/comment`,
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        $('.comment-area').empty()
+                        let commentList = response['commentList'];
+                        for (let i = 0; i < commentList.length; i++) {
+                            let comment = commentList[i];
+                            let writer = comment['nickname'];
+                            let createdAt = comment['created_at'];
+                            let content = comment['content'];
+                            let temp_html = `
+                                <div class="comment-box">
+                                    <div class="comment-nickname">
+                                        <span class="tag is-link is-light">${writer}</span>
+                                        <p class="created-at">${createdAt}</p>
+                                    </div>
+                                    <div class="comment-text">
+                                        <p>${content}</p>
+                                    </div>
+                                </div>
+                            `
+                            $('.comment-area').append(temp_html);
+                        }
+                    }
+                }
+            });
+        }
+
+        function createComments() {
+            let content = $('.comment-input textarea').val();
+            let url = window.location.pathname;
+            let question_id = url.split('/').pop();
+            $.ajax({
+                type: 'POST',
+                url: `/api/question/comment`,
+                data: {
+                    'questionId': question_id,
+                    'content': content
+                },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        showComments()
+                    }
+                }
+            });
+        }
+
+        function updateComments() {
+
+        }
+
+        function deleteComments() {
+
+        }
     </script>
 </head>
 <body>
@@ -215,14 +278,12 @@
 </section>
 
 <section class="comment-input">
-    <form action="{{ url_for('add_comment') }}" method="post">
-        <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요"></textarea>
-        <div class="button-right-align">
-            <button class="button is-success is-light" type="submit">댓글 등록</button>
-        </div>
-    </form>
+    <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요"></textarea>
+    <div class="button-right-align">
+        <button onclick="createComments()" class="button is-success is-light" type="submit">댓글 등록</button>
+    </div>
 </section>
-<section>
+<section class="comment-area">
     {% for comment in comments %}
     <div class="comment-box">
         <div class="comment-nickname">
