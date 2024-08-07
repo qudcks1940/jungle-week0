@@ -121,8 +121,8 @@
                     </button>
                 </p>
                 <p class="control">
-                    <button id="filter-date" class="filter-button button is-rounded is-hover is-light" href="#"
-                        onclick="changeSortMode('date')">
+                    <button id="filter-created_at" class="filter-button button is-rounded is-hover is-light" href="#"
+                        onclick="changeSortMode('created_at')">
                         <span>최신 순</span>
                     </button>
                 </p>
@@ -154,13 +154,13 @@
         'BY_LIFE': 'life',
         'BY_FOOD': 'food',
         'BY_PARTI': 'exercise',
-        'BY_DATE': 'study'
+        'BY_STUDY': 'study'
     }
 
     let filterButtonIdArray = {
         'BY_LIKES': 'likes',
         'BY_PARTI': 'participation',
-        'BY_DATE': 'date'
+        'BY_DATE': 'created_at'
     }
 
     // 카테고리, 정렬 모드 초기화
@@ -170,7 +170,7 @@
     // 필터 버튼 요소
     let filterLikes = document.getElementById("filter-likes");
     let filterParti = document.getElementById("filter-participation");
-    let filterDate = document.getElementById("filter-date");
+    let filterCreatedAt = document.getElementById("filter-created_at");
 
     // 카테고리 카드 요소
     let categoryLife = document.getElementById("category-life");
@@ -182,7 +182,7 @@
     function resetDisplayFilterButton() {
         filterLikes.classList.remove("is-active");
         filterParti.classList.remove("is-active");
-        filterDate.classList.remove("is-active");
+        filterCreatedAt.classList.remove("is-active");
     }
 
     // 모든 카테고리의 선택 표시를 초기화하는 메서드

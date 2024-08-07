@@ -199,18 +199,20 @@ def question(current_user, question_id):
     question_data = db.questions.find_one({'_id': ObjectId(question_id)})
     member_data = db.Member.find_one({'_id': current_user['_id']})
     check_data = db.check.find_one({'member_id': current_user['_id'], 'question_id': ObjectId(question_id)})
-    
+
     if not question_data:
         return jsonify({'error': 'Question not found'}), 404
     if not member_data:
         return jsonify({'error': 'Member not found'}), 404
+    if not check_data:
+        return jsonify({'error': 'Question Check Data not found'}), 404
 
     like_count = Like_collection.count_documents({'question_id': ObjectId(question_id)})
     participant_count = db.check.count_documents({'question_id': ObjectId(question_id)})  # 실제 응답 수 계산
+    comment_count = db.comment.count_documents({'question_id': ObjectId(question_id)})
 
-    comments = session.get('comments', [])
+    return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count)
 
-    return render_template('question.html', like_count=like_count, click_count=participant_count, comments=comments, question=question_data, member=member_data, check=check_data)
 
 # 좋아요 수 증가 및 취소 라우트
 @app.route('/increment_like', methods=['POST'])
@@ -250,20 +252,43 @@ def increment_click(current_user):
 
     return jsonify({'participant_count': participant_count})
 
-# 댓글 추가 라우트
-@app.route('/add_comment', methods=['POST'])
+# 댓글 등록
+@app.route('/api/question/comment', methods=['POST'])
 @token_required
-def add_comment(current_user):
-    comment_text = request.form['comment']
-    comment = {
-        'nickname': current_user['nickname'],
+def createComment(current_user):
+    questionId = ObjectId(request.form['questionId'])
+    memberId = current_user['_id']
+    member_data = db.Member.find_one({'_id': memberId})
+    writer = member_data['nickname']
+    content = request.form['content']
+    data = {
+        'question_id': questionId,
+        'member_id': memberId,
+        'nickname': writer,
         'created_at': datetime.datetime.now().strftime('%Y.%m.%d. %H:%M'),
-        'text': comment_text
+        'content': content
     }
-    if 'comments' not in session:
-        session['comments'] = []
-    session['comments'].append(comment)
-    return redirect(url_for('question'))
+    db.comment.insert_one(data)
+    return jsonify({'result': 'success', 'msg': '댓글 등록 완료!'})
+
+# 댓글 리스트 조회
+@app.route('/api/question/<question_id>/comment', methods=['GET'])
+def readCommentList(question_id):
+    commentList = list(db.comment.find({'question_id': ObjectId(question_id)}))
+    return jsonify({'result': 'success', 'commentList': commentList})
+
+# 댓글 수정
+@app.route('/api/comment/<comment_id>', methods=['PUT'])
+def updateComment(comment_id):
+    content = request.form['content']
+    db.comment.update_one({'_id': ObjectId(comment_id)}, {'$set': {'content': content}})
+    return jsonify({'result': 'success', 'msg': '댓글 수정 완료!'})
+
+# 댓글 삭제
+@app.route('/api/comment/<comment_id>', methods=['DELETE'])
+def deleteComment(comment_id):
+    db.comment.delete_one({'_id': ObjectId(comment_id)})
+    return jsonify({'result': 'success', 'msg': '댓글 삭제 완료!'})
 
 # 질문 등록
 @app.route('/api/question', methods=['POST'])
