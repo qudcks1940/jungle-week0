@@ -268,7 +268,6 @@ def createComment(current_user):
         'created_at': datetime.datetime.now().strftime('%Y.%m.%d. %H:%M'),
         'content': content
     }
-    print(data)
     db.comment.insert_one(data)
     return jsonify({'result': 'success', 'msg': '댓글 등록 완료!'})
 
