@@ -49,7 +49,33 @@ def list_question():
     sort_mode = request.args.get('sortMode', 'likes')  # 기본 정렬 값: 좋아요 순
     is_desc = -1  # 기본 정렬 방향: 내림차순
 
-    questions_cursor = db.questions.find({'category': category_mode}).sort(sort_mode, is_desc)
+    questions_cursor = db.questions.aggregate([
+        {'$match': {'category': category_mode}},
+        {'$sort': {sort_mode: is_desc}},
+        {
+            '$lookup': {
+                'from': 'Member',
+                'localField': 'member_id',
+                'foreignField': '_id',
+                'as': 'member_info'
+            }
+        },
+        {
+            '$unwind': '$member_info'
+        },
+        {
+            '$project': {
+                '_id': 1,
+                'category': 1,
+                'question1': 1,
+                'question2': 1,
+                'created_at': 1,
+                'participant_count': 1,
+                'likes_count': 1,
+                'nickname': '$member_info.nickname'
+            }
+        }
+    ])
     questions_list = list(questions_cursor)  # Cursor 객체를 리스트로 변환
 
     return jsonify({'questions': questions_list})
@@ -76,7 +102,7 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
             current_user = Member_collection.find_one({'id': data['user']})
             if current_user is None:
                 return jsonify({'message': 'User not found!'}), 401
@@ -105,7 +131,7 @@ def login():
             token = jwt.encode({
                 'user': user_id,
                 'exp': datetime.datetime.now() + datetime.timedelta(minutes=30)
-            }, app.config['SECRET_KEY'], algorithm="HS256")
+            }, app.secret_key, algorithm="HS256")
             session['token'] = token
             return redirect(url_for('home'))
         else:
@@ -187,7 +213,6 @@ def increment_click():
         return jsonify({'click_count': session['click_count']})
     return jsonify({'error': 'Click count not found'}), 400
 
-
 # 댓글 추가 라우트
 @app.route('/add_comment', methods=['POST'])
 @token_required
@@ -229,4 +254,3 @@ def createQuestion(current_user):
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
