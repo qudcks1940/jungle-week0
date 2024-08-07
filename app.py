@@ -197,12 +197,13 @@ def question(current_user, question_id):
         return jsonify({'error': 'Question not found'}), 404
     if not member_data:
         return jsonify({'error': 'Member not found'}), 404
+    if not check_data:
+        return jsonify({'error': 'Question Check Data not found'}), 404
 
     like_count = Like_collection.count_documents({'question_id': ObjectId(question_id)})
-    comments = session.get('comments', [])
-    click_count = session.get('click_count', 10)  # 기본 클릭 수
-    
-    return render_template('question.html', like_count=like_count, click_count=click_count, comments=comments, question=question_data, member=member_data, check=check_data)
+    comment_count = db.comment.count_documents({'question_id': ObjectId(question_id)})
+
+    return render_template('question.html', like_count=like_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count)
 
 # 좋아요 수 증가 및 취소 라우트
 @app.route('/increment_like', methods=['POST'])

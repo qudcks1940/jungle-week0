@@ -309,7 +309,6 @@
         <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;" data-question-id="{{ question['_id'] }}">
             👍<span id="like-count">{{ like_count }}</span>
         </button>
-        <span>💬<span id="comment-count">{{ comments|length }}</span></span>
         <span>🖱️<span id="click-count">{{ click_count }}</span></span>
     </div>
 </section>
@@ -335,11 +334,7 @@
 </section>
 
 <!-- 댓글 개수를 표시하는 부분 -->
-<section class="comments-section">
-    <div class="comments-header">
-        <span>댓글 {{ comments|length }}개</span>
-    </div>
-</section>
+<span class="comment-count tag is-black">댓글 {{ commentCount }}개</span>
 
 <section class="comment-input">
     <textarea  class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요"></textarea>
