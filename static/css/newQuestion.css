@@ -1,0 +1,30 @@
+.divider {
+    margin: 20px 0 40px;
+    height: 0;
+    border-bottom: whitesmoke solid 1px;
+}
+
+.wrap {
+    width: 500px;
+    margin: auto;
+}
+
+.new-question-section {
+    margin-top: 30px;
+}
+
+.input-header {
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.question-example {
+    margin-top: 30px;
+    color: darkgrey;
+}
+
+.new-question-button {
+    margin-top: 50px;
+    text-align: end;
+}

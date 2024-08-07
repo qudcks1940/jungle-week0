@@ -8,39 +8,33 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"/>
     <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/newQuestion.css">
 
-    <style>
-        .divider {
-            margin: 20px 0 40px;
-            height: 0;
-            border-bottom: whitesmoke solid 1px;
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        function createQuestion() {
+            let category = $('.select select').val();
+            let question1 = $('.new-question-section .input').eq(0).val();
+            let question2 = $('.new-question-section .input').eq(1).val();
+            $.ajax({
+                type: 'POST',
+                url: '/api/question',
+                data: {
+                    'category': category,
+                    'question1': question1,
+                    'question2': question2
+                },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        console.log('카테고리:', category);
+                        console.log('질문 1:', question1);
+                        console.log('질문 2:', question2);
+                        {#window.location.href = '/';#}
+                    }
+                }
+            })
         }
-
-        .wrap {
-            width: 500px;
-            margin: auto;
-        }
-
-        .new-question-section {
-            margin-top: 30px;
-        }
-
-        .input-header {
-            margin-bottom: 10px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .question-example {
-            margin-top: 30px;
-            color: darkgrey;
-        }
-
-        .new-question-button {
-            margin-top: 50px;
-            text-align: end;
-        }
-    </style>
+    </script>
 
     <title>질문 등록</title>
 </head>
@@ -97,7 +91,7 @@
     <p class="question-example">ex) 질문1(아침밥 먹기) vs 질문2(아침밥 먹을 시간에 자기)</p>
 
     <div class="new-question-button">
-        <button class="button is-success is-light">질문 등록</button>
+        <button class="button is-success is-light" onclick="createQuestion()">질문 등록</button>
     </div>
 </div>
 

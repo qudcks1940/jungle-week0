@@ -59,11 +59,13 @@ def list_question():
 #     return jsonify({ 'result': 'success' })
 
 # .env 파일 로드
+
 load_dotenv()
 
 app = Flask(__name__)
 
 # 환경 변수에서 secret key 로드
+print(os.getenv('SECRET_KEY'))
 app.secret_key = os.getenv('SECRET_KEY')
 
 # 사용자명(id)에 대한 고유 인덱스 생성
@@ -73,16 +75,18 @@ Member_collection.create_index('id', unique=True)
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = session.get('token')
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]
         if not token:
-            return redirect(url_for('login'))
+            return jsonify({'message': 'Token is missing!'}), 401
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = Member_collection.find_one({'id': data['user']})
             if current_user is None:
-                return redirect(url_for('login'))
+                return jsonify({'message': 'User not found!'}), 401
         except:
-            return redirect(url_for('login'))
+            return jsonify({'message': 'Token is invalid!'}), 401
         return f(current_user, *args, **kwargs)
     return decorated
 
@@ -153,24 +157,27 @@ def logout():
     flash('You have successfully logged out', 'success')
     return redirect(url_for('home'))
 
+# 질문 등록
+@app.route('/api/question', methods=['POST'])
+def createQuestion(current_user):
+    memberId = current_user['_id']
+    category = request.form['category']
+    question1 = request.form['question1']
+    question2 = request.form['question2']
+    createdAt = datetime.now()
+
+    data = {
+        'member_id': memberId,
+        'created_at': createdAt,
+        'category': category,
+        'question1': question1,
+        'question2': question2,
+    }
+    print(data)
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!'})
+
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
 
 # JWT 토큰을 요구하는 데코레이터
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'Authorization' in request.headers:
-            token = request.headers['Authorization'].split(" ")[1]
-        if not token:
-            return jsonify({'message': 'Token is missing!'}), 401
-        try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = Member_collection.find_one({'id': data['user']})
-            if current_user is None:
-                return jsonify({'message': 'User not found!'}), 401
-        except:
-            return jsonify({'message': 'Token is invalid!'}), 401
-        return f(current_user, *args, **kwargs)
-    return decorated
