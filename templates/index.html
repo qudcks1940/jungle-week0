@@ -32,11 +32,14 @@
             </div>
             <div class="nav-main">
                 <div class="field is-grouped">
-                    <p class="control">
-                        <a class="button is-light" href="/login">
-                            <span>로그인</span>
-                        </a>
-                    </p>
+                    {% if session.get('token') %}
+                        <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                            <button class="button">로그아웃</button>
+                        </form>
+                        <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
+                    {% else %}
+                        <a class="button" href="{{ url_for('login') }}">로그인</a>
+                    {% endif %}
                 </div>
             </div>
         </nav>

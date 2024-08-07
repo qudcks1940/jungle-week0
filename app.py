@@ -166,7 +166,10 @@ def question():
         session['like_count'] = 10  # 기본 좋아요 수
     if 'click_count' not in session:
         session['click_count'] = 10  # 기본 클릭 수
-    return render_template('question.html', like_count=session['like_count'], click_count=session['click_count'])
+    if 'comments' not in session:
+        session['comments'] = []
+    comments = session['comments']
+    return render_template('question.html', like_count=session['like_count'], click_count=session['click_count'], comments=comments)
 
 # 좋아요 수 증가 라우트
 @app.route('/increment_like', methods=['POST'])
@@ -183,6 +186,22 @@ def increment_click():
         session['click_count'] += 1
         return jsonify({'click_count': session['click_count']})
     return jsonify({'error': 'Click count not found'}), 400
+
+
+# 댓글 추가 라우트
+@app.route('/add_comment', methods=['POST'])
+@token_required
+def add_comment(current_user):
+    comment_text = request.form['comment']
+    comment = {
+        'nickname': current_user['nickname'],
+        'created_at': datetime.datetime.now().strftime('%Y.%m.%d. %H:%M'),
+        'text': comment_text
+    }
+    if 'comments' not in session:
+        session['comments'] = []
+    session['comments'].append(comment)
+    return redirect(url_for('question'))
 
 # 질문 등록
 @app.route('/api/question', methods=['POST'])

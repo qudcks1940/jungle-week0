@@ -80,7 +80,7 @@
         <button id="like-button" class="like-button" style="border: none; background: none; cursor: pointer;">
             👍<span id="like-count">{{ like_count }}</span>
         </button>
-        <span>💬10</span>
+        <span>💬<span id="comment-count">{{ comments|length }}</span></span>
         <span>🖱️<span id="click-count">{{ click_count }}</span></span>
     </div>
 </section>
@@ -96,42 +96,34 @@
         <button class="button question">Success</button>
     </div>
 </section>
-<section class="chart-box">
-</section>
-<section class="comment-input">
-    <textarea class="textarea is-success" rows="3" type="text" placeholder="댓글을 작성해주세요"></textarea>
-    <div class="button-right-align">
-        <button class="button is-success is-light">댓글 등록</button>
+
+<!-- 댓글 개수를 표시하는 부분 -->
+<section class="comments-section">
+    <div class="comments-header">
+        <span>댓글 {{ comments|length }}개</span>
     </div>
+</section>
+
+<section class="comment-input">
+    <form action="{{ url_for('add_comment') }}" method="post">
+        <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요"></textarea>
+        <div class="button-right-align">
+            <button class="button is-success is-light" type="submit">댓글 등록</button>
+        </div>
+    </form>
 </section>
 <section>
+    {% for comment in comments %}
     <div class="comment-box">
         <div class="comment-nickname">
-            <span class="tag is-link is-light">치키차카</span>
-            <p class="created-at">2024.08.06. 14:30</p>
+            <span class="tag is-link is-light">{{ comment.nickname }}</span>
+            <p class="created-at">{{ comment.created_at }}</p>
         </div>
         <div class="comment-text">
-            <p>잘 자야 머리가 잘 돌아감</p>
+            <p>{{ comment.text }}</p>
         </div>
     </div>
-    <div class="comment-box">
-        <div class="comment-nickname">
-            <span class="tag is-link is-light">치키차카</span>
-            <p class="created-at">2024.08.06. 14:30</p>
-        </div>
-        <div class="comment-text">
-            <p>잘 자야 머리가 잘 돌아감</p>
-        </div>
-    </div>
-    <div class="comment-box">
-        <div class="comment-nickname">
-            <span class="tag is-link is-light">치키차카</span>
-            <p class="created-at">2024.08.06. 14:30</p>
-        </div>
-        <div class="comment-text">
-            <p>잘 자야 머리가 잘 돌아감</p>
-        </div>
-    </div>
+    {% endfor %}
 </section>
 </body>
 </html>
