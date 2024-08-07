@@ -391,13 +391,31 @@ def readCommentList(question_id):
 
 # 댓글 수정
 @app.route('/api/comment/<comment_id>', methods=['PUT'])
-@token_required
-def updateComment(current_user, comment_id):
-    writer = db.comment.find_one({'_id': comment_id})['member_id']
-    if current_user['_id'] == writer:
-        content = request.form['content']
-        db.comment.update_one({'_id': ObjectId(comment_id)}, {'$set': {'content': content}})
-        return jsonify({'result': 'success', 'msg': '댓글 수정 완료!'})
+def updateComment(comment_id):
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
+
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
+            if current_user:
+                comment_data = db.comment.find_one({'_id': ObjectId(comment_id)})
+                writer = comment_data['member_id']
+                if current_user['_id'] == writer:
+                    content = request.form['content']
+                    db.comment.update_one({'_id': ObjectId(comment_id)}, {'$set': {'content': content}})
+                    return jsonify({'result': 'success', 'msg': '댓글 수정 완료!'})
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    return jsonify({'result': 'fail', 'msg': '댓글 수정 실패!'})
+
 
 
 # 댓글 삭제
