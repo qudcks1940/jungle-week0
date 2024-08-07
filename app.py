@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from bson import ObjectId
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, json
+from flask.json.provider import JSONProvider
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo import MongoClient
 import jwt
@@ -6,16 +8,17 @@ import datetime
 from functools import wraps
 from dotenv import load_dotenv
 import os
+import json
 
 app = Flask(__name__)
 
 # MongoDB 설정
-client = MongoClient('mongodb+srv://chris309804:1234@cluster0.z80vjt6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+client = MongoClient('mongodb+srv://sparta:jungle@cluster0.b3sejq0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 db = client['balancegamedb']
 Member_collection = db['Member']
 
 #######################################################################
-# MongoDB 조회 결과를 jsonify 메서드를 통해 JSON으로 만들 때 
+# MongoDB 조회 결과를 jsonify 메서드를 통해 JSON으로 만들 때
 # MongoDB의 ObjectId를 파이썬의 문자열 타입으로 변환해주는 부분
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -36,36 +39,30 @@ class CustomJSONProvider(JSONProvider):
 app.json = CustomJSONProvider(app)
 #######################################################################
 
-@app.route('/home')
+@app.route('/')
 def home():
     return render_template('index.html')
 
+@app.route('/question/newquestion')
+def newQuestion():
+    return render_template('newQuestion.html')
+
 @app.route('/api/question/list', methods=['GET'])
 def list_question():
-
     category_mode = request.args.get('category_mode', 'life')
-    sort_mode = request.args.get('sortMode', 'likes') # 기본 정렬 값: 좋아요 순
-    is_desc = -1                                      # 기본 정렬 방향: 내림차순
-    questions = db.questions.find({}, { 'category' : category_mode }).sort({ sort_mode: is_desc })
+    sort_mode = request.args.get('sortMode', 'likes')  # 기본 정렬 값: 좋아요 순
+    is_desc = -1  # 기본 정렬 방향: 내림차순
 
-    return render_template('index.html')
+    questions_cursor = db.questions.find({'category': category_mode}).sort(sort_mode, is_desc)
+    questions_list = list(questions_cursor)  # Cursor 객체를 리스트로 변환
 
-# @app.route('/api/question/like', methods=['POST'])
-# def like_question():
-#     id_receive = request.form['id_give']
-#     current_likes = db.memos.find_one({'_id': ObjectId(id_receive)})['likes']
-#     new_likes = current_likes + 1
-#     db.questions.update_one({'_id': ObjectId(id_receive)}, {'$set': {'likes': new_likes}})
-#     return jsonify({ 'result': 'success' })
+    return jsonify({'questions': questions_list})
+
 
 # .env 파일 로드
-
 load_dotenv()
 
-app = Flask(__name__)
-
 # 환경 변수에서 secret key 로드
-print(os.getenv('SECRET_KEY'))
 app.secret_key = os.getenv('SECRET_KEY')
 
 # 사용자명(id)에 대한 고유 인덱스 생성
@@ -193,23 +190,27 @@ def increment_click():
 
 # 질문 등록
 @app.route('/api/question', methods=['POST'])
+@token_required
 def createQuestion(current_user):
-    memberId = current_user['_id']
-    category = request.form['category']
-    question1 = request.form['question1']
-    question2 = request.form['question2']
-    createdAt = datetime.now()
+    try:
+        category = request.form['category']
+        question1 = request.form['question1']
+        question2 = request.form['question2']
+        createdAt = datetime.datetime.now()
 
-    data = {
-        'member_id': memberId,
-        'created_at': createdAt,
-        'category': category,
-        'question1': question1,
-        'question2': question2,
-    }
-    print(data)
+        data = {
+            'member_id': current_user['_id'],
+            'created_at': createdAt,
+            'category': category,
+            'question1': question1,
+            'question2': question2,
+        }
+        db.questions.insert_one(data)
 
-    return jsonify({'result': 'success', 'msg': '질문 등록 완료!'})
+        return jsonify({'result': 'success', 'msg': '질문 등록 완료!'})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'result': 'fail', 'msg': '질문 등록 실패!'}), 500
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
