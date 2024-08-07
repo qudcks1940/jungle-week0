@@ -32,7 +32,8 @@
             </div>
             <div class="nav-main">
                 <div class="field is-grouped">
-                    {% if session.get('token') %}
+                    {% if current_user %}
+                        <div class="member-nickname"><span class="tag is-link is-light">{{ current_user['nickname'] }}</span>님 안녕하세요</div>
                         <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
                             <button class="button">로그아웃</button>
                         </form>
@@ -128,6 +129,7 @@
                 </p>
             </div>
         </div>
+        {% if current_user %}
         <div class="regist-question">
             <p class="control">
                 <a class="button is-link" href="/question/newquestion">
@@ -135,6 +137,7 @@
                 </a>
             </p>
         </div>
+        {% endif %}
     </div>
 
     <!-- 질문 목록 -->

@@ -40,9 +40,28 @@ class CustomJSONProvider(JSONProvider):
 app.json = CustomJSONProvider(app)
 #######################################################################
 
+# 질문 등록 페이지
 @app.route('/question/newquestion')
 def newQuestion():
-    return render_template('newQuestion.html')
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
+
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
+            if current_user:
+                return render_template('newQuestion.html', current_user=current_user)
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    flash('You need to log in to access this page.', 'warning')
+    return redirect(url_for('home'))
 
 @app.route('/api/question/list', methods=['GET'])
 def list_question():
@@ -123,7 +142,24 @@ def token_required(f):
 # 홈 페이지
 @app.route('/')
 def home():
-    return render_template('index.html')
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
+
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
+            if current_user:
+                return render_template('index.html', current_user=current_user)
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    return render_template('index.html', current_user=None)
 
 # 로그인 페이지 및 처리
 @app.route('/login', methods=['GET', 'POST'])
@@ -181,9 +217,25 @@ def protected(current_user):
 
 # 마이페이지
 @app.route('/mypage', methods = ['GET'])
-@token_required
-def mypage(current_user):
-    return render_template('mypage.html', current_user=current_user)
+def mypage():
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
+
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
+            if current_user:
+                return render_template('mypage.html', current_user=current_user)
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    return render_template('mypage.html', current_user=None)
 
 # 로그아웃
 @app.route('/logout', methods=['POST'])
@@ -194,24 +246,43 @@ def logout():
 
 # 질문 페이지
 @app.route('/question/<question_id>', methods=['GET'])
-@token_required
-def question(current_user, question_id):
-    question_data = db.questions.find_one({'_id': ObjectId(question_id)})
-    member_data = db.Member.find_one({'_id': current_user['_id']})
-    check_data = db.check.find_one({'member_id': current_user['_id'], 'question_id': ObjectId(question_id)})
+def question(question_id):
+    token = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split(" ")[1]
+    elif 'token' in session:
+        token = session.get('token')
 
+    question_data = db.questions.find_one({'_id': ObjectId(question_id)})
+    print(question_data)
     if not question_data:
         return jsonify({'error': 'Question not found'}), 404
+    member_data = db.Member.find_one({'_id': question_data['member_id']})
+    print(member_data)
     if not member_data:
         return jsonify({'error': 'Member not found'}), 404
-    if not check_data:
-        return jsonify({'error': 'Question Check Data not found'}), 404
-
     like_count = Like_collection.count_documents({'question_id': ObjectId(question_id)})
     participant_count = db.check.count_documents({'question_id': ObjectId(question_id)})  # 실제 응답 수 계산
     comment_count = db.comment.count_documents({'question_id': ObjectId(question_id)})
 
-    return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count, current_user=current_user)
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user = Member_collection.find_one({'id': data['user']})
+            if current_user:
+                check_data = db.check.find_one({'member_id': current_user['_id'], 'question_id': ObjectId(question_id)})
+                if not check_data:
+                    return jsonify({'error': 'Question Check Data not found'}), 404
+
+                return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count, current_user=current_user)
+
+        except jwt.ExpiredSignatureError:
+            flash('Token has expired! Please log in again.', 'warning')
+        except jwt.InvalidTokenError:
+            flash('Invalid token! Please log in again.', 'warning')
+
+    return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=None, commentCount=comment_count, current_user=None)
+
 
 
 # 좋아요 수 증가 및 취소 라우트
