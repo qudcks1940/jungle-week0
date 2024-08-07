@@ -79,6 +79,12 @@ def list_question():
     ])
     questions_list = list(questions_cursor)  # Cursor 객체를 리스트로 변환
 
+    for question in questions_list:
+        question['_id'] = str(question['_id'])  # Convert ObjectId to string
+        question['like_count'] = Like_collection.count_documents({'question_id': ObjectId(question['_id'])})
+        question['participant_count'] = db.check.count_documents({'question_id': ObjectId(question['_id'])})  # 실제 응답 수 계산
+
+ 
     return jsonify({'questions': questions_list})
 
 
@@ -125,7 +131,7 @@ def login():
     if request.method == 'POST':
         member_id = request.form['id']
         password = request.form['password']
-
+        
         user = Member_collection.find_one({'id': member_id})
 
         if user and check_password_hash(user['password'], password):
@@ -193,6 +199,7 @@ def question(current_user, question_id):
     question_data = db.questions.find_one({'_id': ObjectId(question_id)})
     member_data = db.Member.find_one({'_id': current_user['_id']})
     check_data = db.check.find_one({'member_id': current_user['_id'], 'question_id': ObjectId(question_id)})
+
     if not question_data:
         return jsonify({'error': 'Question not found'}), 404
     if not member_data:
@@ -201,9 +208,11 @@ def question(current_user, question_id):
         return jsonify({'error': 'Question Check Data not found'}), 404
 
     like_count = Like_collection.count_documents({'question_id': ObjectId(question_id)})
+    participant_count = db.check.count_documents({'question_id': ObjectId(question_id)})  # 실제 응답 수 계산
     comment_count = db.comment.count_documents({'question_id': ObjectId(question_id)})
 
-    return render_template('question.html', like_count=like_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count)
+    return render_template('question.html', like_count=like_count, click_count=participant_count, question=question_data, member=member_data, check=check_data, commentCount=comment_count)
+
 
 # 좋아요 수 증가 및 취소 라우트
 @app.route('/increment_like', methods=['POST'])
@@ -233,11 +242,15 @@ def increment_like(current_user):
 
 # 클릭 수 증가 라우트
 @app.route('/increment_click', methods=['POST'])
-def increment_click():
-    if 'click_count' in session:
-        session['click_count'] += 1
-        return jsonify({'click_count': session['click_count']})
-    return jsonify({'error': 'Click count not found'}), 400
+@token_required
+def increment_click(current_user):
+    question_id = request.form['question_id']
+    question_obj_id = ObjectId(question_id)
+    
+    # 해당 질문의 응답 수 계산
+    participant_count = db.check.count_documents({'question_id': question_obj_id})
+
+    return jsonify({'participant_count': participant_count})
 
 # 댓글 등록
 @app.route('/api/question/comment', methods=['POST'])
@@ -324,16 +337,11 @@ def clickQuestion(current_user, question_id):
     if not checkData:
         db.check.insert_one(data)
         return jsonify({'result': 'success', 'msg': '질문 선택 완료!'})
-
     elif check != checkData['check']:
         db.check.update_one(findData, {'$set': {'check': check}})
         return jsonify({'result': 'success', 'msg': '질문 선택 변경 완료!'})
-
     else:
         return jsonify({'result': 'success', 'msg': '질문 선택 유지'})
-
-
-
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)

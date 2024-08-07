@@ -247,14 +247,14 @@
 
     // 파라미터로 전달받은 질문을 화면에 띄우기
     function addQuestionCard(questions) {
-    for (let i = 0; i < questions.length; i++) {
+        for (let i = 0; i < questions.length; i++) {
         let category = questions[i]['category'];
         let qId = questions[i]['_id'];
         let q1 = questions[i]['question1'];
         let q2 = questions[i]['question2'];
         let createdAt = questions[i]['created_at'];
         let partiCount = questions[i]['participant_count'];
-        let likesCount = questions[i]['likes_count'];
+        let likesCount = questions[i]['like_count'];
         let nickname = questions[i]['nickname'];  // 추가된 작성자 정보
 
         let card =
