@@ -86,10 +86,14 @@ body {
     text-align: end;
 }
 
+.comment-area {
+    padding-bottom: 5px;
+    border-bottom: whitesmoke solid 1px;
+}
+
 .comment-box {
     padding: 20px;
     display: flex;
-    border-bottom: whitesmoke solid 1px;
 }
 
 .comment-nickname {
@@ -105,4 +109,8 @@ body {
 .created-at {
     font-weight: normal;
     color: darkgrey;
+}
+
+.comment-btn {
+    text-align: end;
 }

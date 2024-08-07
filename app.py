@@ -261,7 +261,6 @@ def createComment(current_user):
 @app.route('/api/question/<question_id>/comment', methods=['GET'])
 def readCommentList(question_id):
     commentList = list(db.comment.find({'question_id': ObjectId(question_id)}))
-    print(commentList)
     return jsonify({'result': 'success', 'commentList': commentList})
 
 # 질문 등록
