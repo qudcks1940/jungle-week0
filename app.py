@@ -39,17 +39,13 @@ class CustomJSONProvider(JSONProvider):
 app.json = CustomJSONProvider(app)
 #######################################################################
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
 @app.route('/question/newquestion')
 def newQuestion():
     return render_template('newQuestion.html')
 
 @app.route('/api/question/list', methods=['GET'])
 def list_question():
-    category_mode = request.args.get('category_mode', 'life')
+    category_mode = request.args.get('categoryMode', 'life')
     sort_mode = request.args.get('sortMode', 'likes')  # 기본 정렬 값: 좋아요 순
     is_desc = -1  # 기본 정렬 방향: 내림차순
 
