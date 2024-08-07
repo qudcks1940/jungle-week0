@@ -16,6 +16,18 @@
             let category = $('.select select').val();
             let question1 = $('.new-question-section .input').eq(0).val();
             let question2 = $('.new-question-section .input').eq(1).val();
+            console.log('카테고리:', category);
+            console.log('질문 1:', question1);
+            console.log('질문 2:', question2);
+
+            // 세션에 저장된 토큰 가져오기
+            let token = sessionStorage.getItem('token');
+            console.log(token);
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+
             $.ajax({
                 type: 'POST',
                 url: '/api/question',
@@ -24,16 +36,31 @@
                     'question1': question1,
                     'question2': question2
                 },
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
                 success: function (response) {
-                    if (response['result'] == 'success') {
-                        console.log('카테고리:', category);
-                        console.log('질문 1:', question1);
-                        console.log('질문 2:', question2);
-                        {#window.location.href = '/';#}
+                    if (response['result'] === 'success') {
+                        window.location.href = '/';
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    if (xhr.status === 401) {
+                        alert('인증 오류: 로그인 페이지로 이동합니다.');
+                        window.location.href = '/login';
                     }
                 }
-            })
+            });
         }
+
+        // 페이지가 로드될 때 세션에서 토큰을 로컬 스토리지에 저장
+        $(document).ready(function() {
+            const token = '{{ session["token"] if "token" in session else "" }}';
+            if (token) {
+                sessionStorage.setItem('token', token);
+            }
+        });
     </script>
 
     <title>질문 등록</title>
@@ -61,11 +88,11 @@
         <h1 class="input-header">카테고리</h1>
         <div class="select">
             <select>
-                <option>기타</option>
-                <option>생활</option>
-                <option>운동</option>
-                <option>음식</option>
-                <option>공부</option>
+                <option value="other">기타</option>
+                <option value="life">생활</option>
+                <option value="exercise">운동</option>
+                <option value="food">음식</option>
+                <option value="study">공부</option>
             </select>
         </div>
     </section>
