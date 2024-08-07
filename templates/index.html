@@ -10,105 +10,19 @@
     <!-- Bulma -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet" />
+    <!-- base.html용 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
+
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Font Awesome -->
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-
-    <style>
-        body {
-            max-width: 1000px;
-            margin: auto;
-            padding: 0 15px;
-        }
-
-        header>#top-nav {
-            overflow: hidden;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        .banner {
-            margin-top: 5px;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        .category-card-wrapper {
-            padding: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .wrap-title {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-        }
-
-        .card-height {
-            height: 100%;
-        }
-
-        .category-card.active {
-            background-color: aquamarine;
-        }
-
-        .card-wrap {
-            padding: 10px;
-        }
-
-        .question-card {
-            margin-top: 1rem;
-        }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .count-group {
-            display: flex;
-        }
-
-        header>#top-nav,
-        #sub-nav {
-            overflow: hidden;
-            display: flex;
-            justify-content: space-between;
-            padding: 1rem;
-        }
-
-        .nav-main {
-            display: flex;
-        }
-
-        .question-card {
-            margin-top: 1rem;
-        }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .count-group {
-            display: flex;
-        }
-
-        .q-info {
-            margin-right: 10px;
-        }
-    </style>
 </head>
 
 <body>
+    <!-- 헤더 -->
     <header>
         <nav id="top-nav" role="navigation" class="is-white">
             <div class="nav-logo">
@@ -116,38 +30,38 @@
                     <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
                 </a>
             </div>
-
             <div class="nav-main">
                 <div class="field is-grouped">
-                    {% if session.get('token') %}
-                        <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
-                            <button class="button">로그아웃</button>
-                        </form>
-                        <a class="button" href="{{ url_for('mypage') }}">마이 페이지</a>
-                    {% else %}
-                        <a class="button" href="{{ url_for('login') }}">로그인</a>
-                    {% endif %}
+                    <p class="control">
+                        <a class="button is-light" href="/login">
+                            <span>로그인</span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button is-light" href="/singin">
+                            <span>회원가입</span>
+                        </a>
+                    </p>
                 </div>
             </div>
-            
         </nav>
 
-        <section class="hero is-success banner">
+        <section class="hero is-success">
             <div class="hero-body center">
                 <p class="title">정글 밸런스 게임</p>
                 <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
             </div>
         </section>
     </header>
-
+    <!-- 카테고리 선택 -->
     <div class="category-card-wrapper">
         <div class="wrap-title">
-            원하는 카테고리의 밸런스 게임을 시작해 보세요!
+            <span>원하는 카테고리의 밸런스 게임을 시작해 보세요!</span>
         </div>
-
         <div class="columns">
             <div class="column">
-                <div id="category-life" class="card category-card card-height">
+                <div id="category-life" class="card category-card category-card-height"
+                    onclick="changeCategoryMode('life')">
                     <div class="card-content">
                         <p class="title is-6">
                             정글 생활
@@ -157,7 +71,8 @@
                 </div>
             </div>
             <div class="column">
-                <div id="category-food" class="card category-card card-height">
+                <div id="category-food" class="card category-card category-card-height"
+                    onclick="changeCategoryMode('food')">
                     <div class="card-content">
                         <p class="title is-6">
                             정글 음식
@@ -167,7 +82,8 @@
                 </div>
             </div>
             <div class="column">
-                <div id="category-exercise" class="card category-card card-height">
+                <div id="category-exercise" class="card category-card category-card-height"
+                    onclick="changeCategoryMode('exercise')">
                     <div class="card-content">
                         <p class="title is-6">
                             정글 운동
@@ -177,7 +93,8 @@
                 </div>
             </div>
             <div class="column">
-                <div id="category-study" class="card category-card card-height">
+                <div id="category-study" class="card category-card category-card-height"
+                    onclick="changeCategoryMode('study')">
                     <div class="card-content">
                         <p class="title is-6">
                             정글 공부
@@ -189,234 +106,202 @@
         </div>
     </div>
     <hr>
+    <!-- 필터 메뉴 -->
     <div id="sub-nav">
         <div class="filter-group">
             <div class="field is-grouped">
                 <p class="control">
-                    <a id="filter-likes" class="filter-button button is-rounded is-hover is-light" href="#">
+                    <button id="filter-likes" class="filter-button button is-rounded is-hover is-light" href="#"
+                        onclick="changeSortMode('likes')">
                         <span>좋아요 순</span>
-                    </a>
+                    </button>
                 </p>
                 <p class="control">
-                    <a id="filter-participation" class="filter-button button is-rounded is-hover is-light" href="#">
+                    <button id="filter-participation" class="filter-button button is-rounded is-hover is-light" href="#"
+                        onclick="changeSortMode('participation')">
                         <span>참여도 순</span>
-                    </a>
+                    </button>
                 </p>
                 <p class="control">
-                    <a id="filter-hits" class="filter-button button is-rounded is-hover is-light" href="#">
-                        <span>조회 순</span>
-                    </a>
-                </p>
-                <p class="control">
-                    <a id="filter-date" class="filter-button button is-rounded is-hover is-light" href="#">
+                    <button id="filter-date" class="filter-button button is-rounded is-hover is-light" href="#"
+                        onclick="changeSortMode('date')">
                         <span>최신 순</span>
-                    </a>
+                    </button>
                 </p>
             </div>
         </div>
         <div class="regist-question">
             <p class="control">
-                <a class="button is-link" href="/api/question">
+                <a class="button is-link" href="/question/newquestion">
                     <span>새로운 질문 등록</span>
                 </a>
             </p>
         </div>
     </div>
 
-    <content>
-        <div class="card-wrap">
-
-            <div class="question-card card">
-                <div class="card-content">
-                    <div class="media">
-                        <div class="media-left">
-                            <figure class="image is-48x48">
-                                <img src="https://bulma.io/assets/images/placeholders/96x96.png" alt="Placeholder image" />
-                            </figure>
-                        </div>
-                        <div class="media-content">
-                            <p class="title is-4">아침밥 vs 아침잠</p>
-                            <p class="subtitle is-6">치키차카</p>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="question-date">
-                            <p>2024.03.31. 16:00:00</p>
-                        </div>
-
-                        <div class="count-group">
-                            <div class="q-info likes">
-                                <i class="fas fa-solid fa-heart"></i> <span>3</span>
-                            </div>
-                            <div class="q-info parti">
-                                <i class="fas fa-solid fa-users"></i> <span>4</span>
-                            </div>
-
-                            <div class="q-info hits">
-                                <i class="fas fa-regular fa-eye"></i> <span>5</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="question-card card">
-                <div class="card-content">
-                    <div class="media">
-                        <div class="media-left">
-                            <figure class="image is-48x48">
-                                <img src="https://bulma.io/assets/images/placeholders/96x96.png" alt="Placeholder image" />
-                            </figure>
-                        </div>
-                        <div class="media-content">
-                            <p class="title is-4">아침밥 vs 아침잠</p>
-                            <p class="subtitle is-6">치키차카</p>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="question-date">
-                            <p>2024.03.31. 16:00:00</p>
-                        </div>
-
-                        <div class="count-group">
-                            <div class="q-info likes">
-                                <i class="fas fa-solid fa-heart"></i> <span>3</span>
-                            </div>
-                            <div class="q-info parti">
-                                <i class="fas fa-solid fa-users"></i> <span>4</span>
-                            </div>
-
-                            <div class="q-info hits">
-                                <i class="fas fa-regular fa-eye"></i> <span>5</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="question-card card">
-                <div class="card-content">
-                    <div class="media">
-                        <div class="media-left">
-                            <figure class="image is-48x48">
-                                <img src="https://bulma.io/assets/images/placeholders/96x96.png" alt="Placeholder image" />
-                            </figure>
-                        </div>
-                        <div class="media-content">
-                            <p class="title is-4">아침밥 vs 아침잠</p>
-                            <p class="subtitle is-6">치키차카</p>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="question-date">
-                            <p>2024.03.31. 16:00:00</p>
-                        </div>
-
-                        <div class="count-group">
-                            <div class="q-info likes">
-                                <i class="fas fa-solid fa-heart"></i> <span>3</span>
-                            </div>
-                            <div class="q-info parti">
-                                <i class="fas fa-solid fa-users"></i> <span>4</span>
-                            </div>
-
-                            <div class="q-info hits">
-                                <i class="fas fa-regular fa-eye"></i> <span>5</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </content>
-
-    <script>
-        let categoryModeArray = {
-            'categoryLife': 'life',
-            'categoryFood': 'food',
-            'categoryExercise': 'exercise',
-            'categoryStudy': 'study'
-        }
-
-        let sortModeArray = {
-            'filterLikes': 'like_count',
-            'filterParti': 'participant_count',
-            'filterHits': 'hit_count',
-            'filterDate': 'created_at'
-        }
-
-        let categoryMode = categoryModeArray['categoryLife'];
-        let sortMode = sortModeArray['filterLikes'];
-
-        function resetDisplayCategory() {
-            categoryLife.classList.remove("active");
-            categoryFood.classList.remove("active");
-            categoryExercise.classList.remove("active");
-            categoryStudy.classList.remove("active");
-        }
-
-        let categoryLife = document.getElementById("category-life");
-        let categoryFood = document.getElementById("category-food");
-        let categoryExercise = document.getElementById("category-exercise");
-        let categoryStudy = document.getElementById("category-study");
-
-        categoryLife.addEventListener("click", function () {
-            resetDisplayCategory();
-            categoryLife.classList.add("active");
-        })
-
-        categoryFood.addEventListener("click", function () {
-            resetDisplayCategory();
-            categoryFood.classList.add("active");
-        })
-
-        categoryExercise.addEventListener("click", function () {
-            resetDisplayCategory();
-            categoryExercise.classList.add("active");
-        })
-
-        categoryStudy.addEventListener("click", function () {
-            resetDisplayCategory();
-            categoryStudy.classList.add("active");
-        })
-
-
-        function resetDisplayFilter() {
-            filterLikes.classList.remove("is-active");
-            filterParti.classList.remove("is-active");
-            filterHits.classList.remove("is-active");
-            filterDate.classList.remove("is-active");
-        }
-
-        let filterLikes = document.getElementById("filter-likes");
-        let filterParti = document.getElementById("filter-participation");
-        let filterHits = document.getElementById("filter-hits");
-        let filterDate = document.getElementById("filter-date");
-
-        filterLikes.addEventListener("click", function () {
-            resetDisplayFilter();
-            filterLikes.classList.add("is-active");
-        })
-
-        filterParti.addEventListener("click", function () {
-            resetDisplayFilter();
-            filterParti.classList.add("is-active");
-        })
-
-        filterHits.addEventListener("click", function () {
-            resetDisplayFilter();
-            filterHits.classList.add("is-active");
-        })
-
-        filterDate.addEventListener("click", function () {
-            resetDisplayFilter();
-            filterDate.classList.add("is-active");
-        })
-
-    </script>
+    <!-- 질문 목록 -->
+    <div id="question-list" class="question-card-wrap">
+    </div>
 </body>
+<script>
+    //페이지가 로드되면 카테고리, 정렬 모드에 따라 밸런스 게임 질문 목록을 가져와서 화면에 표시
+    $(document).ready(function () {
+        displayCategoryMode();                      // 카테고리 모드 표시
+        displaySortMode();                          // 정렬 모드 표시
+
+        showQuestions();                            // 카테고리, 정렬 모드에 따라 질문 카드 불러오기
+    })
+
+    let categoryModeArray = {
+        'BY_LIFE': 'life',
+        'BY_FOOD': 'food',
+        'BY_PARTI': 'exercise',
+        'BY_DATE': 'study'
+    }
+
+    let filterButtonIdArray = {
+        'BY_LIKES': 'likes',
+        'BY_PARTI': 'participation',
+        'BY_DATE': 'date'
+    }
+
+    // 카테고리, 정렬 모드 초기화
+    let categoryMode = categoryModeArray['BY_LIFE'];
+    let sortMode = filterButtonIdArray['BY_LIKES'];
+
+    // 필터 버튼 요소
+    let filterLikes = document.getElementById("filter-likes");
+    let filterParti = document.getElementById("filter-participation");
+    let filterDate = document.getElementById("filter-date");
+
+    // 카테고리 카드 요소
+    let categoryLife = document.getElementById("category-life");
+    let categoryFood = document.getElementById("category-food");
+    let categoryExercise = document.getElementById("category-exercise");
+    let categoryStudy = document.getElementById("category-study");
+
+    // 모든 필터 버튼의 선택 표시를 초기화하는 메서드
+    function resetDisplayFilterButton() {
+        filterLikes.classList.remove("is-active");
+        filterParti.classList.remove("is-active");
+        filterDate.classList.remove("is-active");
+    }
+
+    // 모든 카테고리의 선택 표시를 초기화하는 메서드
+    function resetDisplayCategory() {
+        categoryLife.classList.remove("active");
+        categoryFood.classList.remove("active");
+        categoryExercise.classList.remove("active");
+        categoryStudy.classList.remove("active");
+    }
+
+    // 필터 버튼 클릭 이벤트
+    function changeSortMode(newSortMode) {
+        if (newSortMode == sortMode) return;
+        sortMode = newSortMode;                             // 카테고리 모드 변경
+
+        displaySortMode();                                  // 선택한 카테고리 모드 표시
+        showQuestions();                                    // 선택한 카테고리에 속하는 질문 카드 보여주기
+    }
+
+    // 카테고리 클릭 이벤트
+    function changeCategoryMode(newCategoryMode) {
+        if (newCategoryMode == categoryMode) return;
+        categoryMode = newCategoryMode;                         // 카테고리 모드 변경
+
+        displayCategoryMode();                                  // 선택한 카테고리 모드 표시
+        showQuestions();                                        // 선택한 카테고리에 속하는 질문 카드 보여주기
+    }
+
+    function displaySortMode() {
+        resetDisplayFilterButton();                   // 모든 필터 버튼의 선택 표시 초기화
+
+        let targetFilterButton = document.getElementById(`filter-${sortMode}`);
+        targetFilterButton.classList.add("is-active");
+    }
+
+    // 카테고리, 정렬 선택 모드 표시
+    function displayCategoryMode() {
+        resetDisplayCategory();                                 // 모든 카테고리 카드의 선택 표시 초기화
+
+        let targetCategoryCard = document.getElementById(`category-${categoryMode}`);
+        targetCategoryCard.classList.add("active");            // 클릭 이벤트가 발생한 카테고리에 선택 표시                     
+    }
+
+    // AJAX 통신으로 전체 메모 조회
+    function showQuestions() {
+        $.ajax({
+            url: "/api/question/list",
+            type: "GET",
+            data: {
+                'categoryMode': categoryMode,
+                'sortMode': sortMode
+            },
+            success: function (response) {
+                // 화면의 기존 질문 목록을 지우기
+                $("#question-list").empty();
+                console.log('empty')
+
+                // 응답으로 받은 질문 목록을 화면에 띄우기
+                questions = response['questions'];
+                addQuestionCard(questions);
+            }
+        })
+    }
+
+    // 파라미터로 전달받은 질문을 화면에 띄우기
+    function addQuestionCard(questions) {
+        for (let i = 0; i < questions.length; i++) {
+            let category = questions[i]['category'];
+            let qId = question[i]['_id']
+            let q1 = questions[i]['question1'];
+            let q2 = questions[i]['question2']
+
+            let createdAt = questions[i]['created_at'];
+            let partiCount = questions[i]['participant_count'];
+            let likesCount = questions[i]['likes_count'];
+
+            let card =
+                `<div id="${category}-${qId}" class="question-card card">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-content">
+                            <p class="title is-4">
+                                <span>${q1}</span> VS <span>${q2}<span>
+                            </p>
+                            <p class="subtitle is-6">작성자 불러오기 보류</p>
+                        </div>
+                    </div>
+                    <div class="question-card-footer">
+                        <div class="question-date">
+                            <p>${createdAt}</p>
+                        </div>
+                        <div class="count-group">
+                            <div class="q-info likes">
+                                <i class="fas fa-solid fa-heart"></i> <span>${likesCount}</span>
+                            </div>
+                            <div class="q-info parti">
+                                <i class="fas fa-solid fa-users"></i> <span>${partiCount}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            let wrap = document.getElementById("question-list");
+            wrap.html(card);
+        }
+
+        // 질문 카드를 클릭하면 질문 페이지로 이동
+        // let questionClickEventList = document.querySelectorAll(".category-card");
+        // questionClickEventList.forEach(function (question) {
+
+        //     let qInfo = question.getAttribute("id").split['-']
+        //     let qId = qInfo[0];
+        //     let qCategory = qInfo[1];
+        //     location.href = `/question/${qCategory}/${qId}`;
+        // })
+    }
+
+</script>
 
 </html>
