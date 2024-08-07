@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Black+And+White+Picture&display=swap" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  
+
     <title>질문</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -59,14 +59,26 @@
                     "questionNum": 1
                 },
                 success: function(response) {
-                    console.log(response['msg']);
-                    question_refresh();
-                },
-                error: function(error) {
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
-                        question_refresh(1);
+                        $('.question-box').empty();
+                        let temp_html = `
+                            <div class="button-box question-select">
+                                <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
+                            </div>
+                            <div class="versus">
+                                <span class="versus-v">V</span>
+                                <span class="versus-s">S</span>
+                            </div>
+                            <div class="button-box">
+                                <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
+                            </div>
+                        `
+                        $('.question-box').append(temp_html);
                     }
+                },
+                error: function(error) {
+                    console.log("Error:", error);
                 }
             });
         }
@@ -83,7 +95,20 @@
                 success: function(response) {
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
-                        question_refresh(2);
+                        $('.question-box').empty();
+                        let temp_html = `
+                            <div class="button-box">
+                                <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
+                            </div>
+                            <div class="versus">
+                                <span class="versus-v">V</span>
+                                <span class="versus-s">S</span>
+                            </div>
+                            <div class="button-box question-select">
+                                <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
+                            </div>
+                        `
+                        $('.question-box').append(temp_html);
                     }
                 },
                 error: function(error) {
@@ -92,24 +117,19 @@
             });
         }
 
-        function question_refresh(checkNum) {
+        function question_refresh() {
             $('.question-box').empty();
-            let select1 = '';
-            let select2 = '';
-            if (checkNum == 1) {
-                select1 = 'question-select';
-            } else {
-                select2 = 'question-select';
-            }
             let temp_html = `
-                <div class="button-box ${select1}">
+                <div class="button-box question-select">
+                <div class="button-box">
                     <button onclick="question1()" class="button question">{{ question['question1'] }}</button>
                 </div>
                 <div class="versus">
                     <span class="versus-v">V</span>
                     <span class="versus-s">S</span>
                 </div>
-                    <div class="button-box ${select2}">
+                <div class="button-box question-select">
+                <div class="button-box">
                     <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
                 </div>
             `
@@ -165,7 +185,7 @@
     </div>
 </section>
 <section class="question-box lr-align">
-    {% if check['check'] == 1 %}
+    {% if check['check'] == '1' %}
     <div class="button-box question-select">
     {% else %}
     <div class="button-box">
@@ -176,10 +196,10 @@
         <span class="versus-v">V</span>
         <span class="versus-s">S</span>
     </div>
-    {% if check['check'] == 2 %}
-        <div class="button-box question-select">
+    {% if check['check'] == '2' %}
+    <div class="button-box question-select">
     {% else %}
-        <div class="button-box">
+    <div class="button-box">
     {% endif %}
         <button onclick="question2()" class="button question">{{ question['question2'] }}</button>
     </div>

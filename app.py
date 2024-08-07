@@ -187,10 +187,14 @@ def logout():
 
 # 질문 페이지
 @app.route('/question/<question_id>', methods=['GET'])
-def question(question_id):
+@token_required
+def question(current_user, question_id):
     question_data = db.questions.find_one({'_id': ObjectId(question_id)})
-    member_data = db.Member.find_one({'_id': question_data['member_id']})
-    check_data = db.check.find_one({'member_id': question_data['member_id'], 'questionId': question_id})
+    member_data = db.Member.find_one({'_id': current_user['_id']})
+    check_data = db.check.find_one({'member_id': current_user['_id'], 'question_id': ObjectId(question_id)})
+    print(question_data)
+    print(member_data)
+    print(check_data)
     if not question_data:
         return jsonify({'error': 'Question not found'}), 404
     if not member_data:
@@ -266,7 +270,7 @@ def createQuestion(current_user):
 @token_required
 def clickQuestion(current_user, question_id):
     memberId = current_user['_id']
-    questionId = question_id
+    questionId = ObjectId(question_id)
     check = request.form['questionNum']
 
     findData = {
