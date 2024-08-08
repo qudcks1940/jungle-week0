@@ -1,16 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <title>정글 밸런스 게임 | 회원가입
+    </title>
+
+    <!-- Bulma -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet" />
+    <!-- base.html용 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Font Awesome -->
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 </head>
+
 <body>
+    <!-- 헤더 -->
+    <header>
+        <nav id="top-nav" role="navigation" class="is-white">
+            <div class="nav-logo">
+                <a class="navbar-item" href="/">
+                    <img src="{{ url_for('static', filename='image/kaist_sw-logo.png') }}">
+                </a>
+            </div>
+            <div class="nav-main">
+                <div class="field is-grouped">
+                    {% if current_user %}
+                    <div class="member-nickname"><span class="tag is-link is-light">{{ current_user['nickname']
+                            }}</span>님 안녕하세요</div>
+                    <form action="{{ url_for('logout') }}" method="post" style="margin-right: 10px;">
+                        <button class="button">로그아웃</button>
+                    </form>
+                    {% else %}
+                    <a class="button" href="{{ url_for('login') }}">로그인</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <section class="hero is-success">
+            <div class="hero-body center">
+                <p class="title">정글 밸런스 게임</p>
+                <p class="subtitle is-6">나만의 정글 리추얼 만들기</p>
+            </div>
+        </section>
+    </header>
 <section class="section">
     <div class="container">
-        <h1 class="title">Register</h1>
+        <h1 class="title">회원가입</h1>
         {% if message %}
         <div class="notification {{ 'is-danger' if error else 'is-success' }}">
             {{ message }}
@@ -72,7 +117,7 @@ HTML 반환: 서버에서 렌더링된 HTML이 클라이언트로 반환됩니�
             <div class="field">
                 <p class="control">
                     <button class="button is-success">
-                        Register
+                        등록
                     </button>
                 </p>
             </div>
