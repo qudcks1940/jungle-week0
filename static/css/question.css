@@ -72,6 +72,15 @@ body {
     right: 7px;
 }
 
+.statistics-box {
+    text-align: center;
+}
+
+.statistics-box div {
+    font-size: 30px;
+    font-weight: bold;
+}
+
 .invitor_count {
     display: inline-block;
 }
