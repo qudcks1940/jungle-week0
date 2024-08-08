@@ -365,7 +365,7 @@ def createComment():
         except jwt.InvalidTokenError:
             flash('Invalid token! Please log in again.', 'warning')
 
-    return jsonify({'result': 'fail', 'msg': '댓글 등록 실패!'})
+    return jsonify({'result': 'fail', 'msg': '로그인 후 사용 가능합니다'})
 
 
     questionId = ObjectId(request.form['questionId'])
@@ -381,7 +381,7 @@ def createComment():
         'content': content
     }
     db.comment.insert_one(data)
-    return jsonify({'result': 'success', 'msg': '댓글 등록 완료!'})
+    return jsonify({'result': 'success', 'msg': '로그인 후 사용 가능합니다'})
 
 # 댓글 리스트 조회
 @app.route('/api/question/<question_id>/comment', methods=['GET'])
@@ -414,7 +414,7 @@ def updateComment(comment_id):
         except jwt.InvalidTokenError:
             flash('Invalid token! Please log in again.', 'warning')
 
-    return jsonify({'result': 'fail', 'msg': '댓글 수정 실패!'})
+    return jsonify({'result': 'fail', 'msg': '로그인 후 사용 가능합니다'})
 
 
 
@@ -448,7 +448,7 @@ def createQuestion(current_user):
         return jsonify({'result': 'success', 'msg': '질문 등록 완료!'})
     except Exception as e:
         print(f"Error: {e}")
-        return jsonify({'result': 'fail', 'msg': '질문 등록 실패!'}), 500
+        return jsonify({'result': 'fail', 'msg': '로그인 후 사용 가능합니다'}), 500
 
 # 질문 선택
 @app.route('/api/question/<question_id>/click', methods=['POST'])
@@ -497,7 +497,7 @@ def clickQuestion(question_id):
         except jwt.InvalidTokenError:
             flash('Invalid token! Please log in again.', 'warning')
 
-    return jsonify({'result': 'fail', 'msg': '질문 선택 실패'})
+    return jsonify({'result': 'fail', 'msg': '로그인 후 사용 가능합니다'})
 
 
 if __name__ == '__main__':
