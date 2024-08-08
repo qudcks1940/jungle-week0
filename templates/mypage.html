@@ -42,20 +42,13 @@
 <section class="section">
     <div class="container">
         <h1 class="title">My Page</h1>
-        <p>Hello, {{ current_user._id }}!</p>
-        <h2>Participated Balance Games</h2>
-        <ul>
-            {% for question in current_user.participant_questions %}
-                <li>{{ question }}</li>
-            {% endfor %}
-        </ul>
-        <h2>Created Balance Games</h2>
-        <ul>
-            {% for question in current_user.create_questions %}
-                <li>{{ question }}</li>
-            {% endfor %}
-        </ul>
-        <a class="button is-primary" href="{{ url_for('logout') }}">Logout</a>
+        <h2>참여한 밸런스 게임 목록</h2>
+        <br>
+        <br>
+        <h2>생성한 밸런스 게임 목록</h2>
+        <br>
+        <br>
+        <h2>좋아요 누른 밸런스 게임 목록</h2>
     </div>
 </section>
 </body>
