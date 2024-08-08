@@ -66,7 +66,7 @@ def newQuestion():
         except jwt.InvalidTokenError:
             flash('Invalid token! Please log in again.', 'warning')
 
-    flash('You need to log in to access this page.', 'warning')
+    flash('접근할 수 없는 페이지 입니다.', 'warning')
     return redirect(url_for('home'))
 
 @app.route('/api/question/list', methods=['GET'])
@@ -241,7 +241,7 @@ def mypage():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('token', None)
-    flash('You have successfully logged out', 'success')
+    flash('로그아웃이 성공적으로 완료되었습니다.', 'success')
     return redirect(url_for('home'))
 
 # 질문 페이지
@@ -292,7 +292,6 @@ def increment_like():
 
     question_id = request.form['question_id']
     question_obj_id = ObjectId(question_id)
-    like_count = Like_collection.count_documents({'question_id': question_obj_id})
     if token:
         try:
             data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
@@ -313,6 +312,7 @@ def increment_like():
                 action = "liked"
 
             # 해당 질문의 좋아요 수 계산
+            like_count = Like_collection.count_documents({'question_id': question_obj_id})
 
             if current_user:
                 return jsonify({'result': 'success', 'like_count': like_count, 'action': action})
@@ -321,7 +321,8 @@ def increment_like():
         except jwt.InvalidTokenError:
             flash('Invalid token! Please log in again.', 'warning')
 
-    return jsonify({'result': 'fail', 'like_count': None, 'action': None})
+    like_count = Like_collection.count_documents({'question_id': question_obj_id})
+    return jsonify({'result': 'fail', 'like_count': like_count, 'action': None})
 
 
 
@@ -481,16 +482,16 @@ def clickQuestion(question_id):
             if current_user:
                 if not checkData:
                     db.check.insert_one(data)
-                    # 해당 질문의 응답 수 계산
-                    participant_count = db.check.count_documents({'question_id': questionId})
-                    return jsonify({'result': 'success', 'msg': '질문 선택 완료!', 'participant_count': participant_count})
                 elif check != checkData['check']:
-                    participant_count = db.check.count_documents({'question_id': questionId})
                     db.check.update_one(findData, {'$set': {'check': check}})
-                    return jsonify({'result': 'success', 'msg': '질문 선택 변경 완료!', 'participant_count': participant_count})
-                else:
-                    participant_count = db.check.count_documents({'question_id': questionId})
-                    return jsonify({'result': 'success', 'msg': '질문 선택 유지', 'participant_count': participant_count})
+                participant_count = db.check.count_documents({'question_id': questionId})
+                same_check_count = db.check.count_documents({'question_id': questionId, 'check': check})
+                check_percent = round((same_check_count / participant_count) * 100, 2)
+                statistics_data = {
+                    'same_check_count': same_check_count,
+                    'check_percent': check_percent,
+                }
+                return jsonify({'result': 'success', 'msg': '질문 선택 완료!', 'participant_count': participant_count, 'statistics_data': statistics_data})
         except jwt.ExpiredSignatureError:
             flash('Token has expired! Please log in again.', 'warning')
         except jwt.InvalidTokenError:

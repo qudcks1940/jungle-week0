@@ -89,6 +89,10 @@
     </div>
 </section>
 
+<section class="statistics-box">
+    <!-- 통계 -->
+</section>
+
 <!-- 댓글 개수를 표시하는 부분 -->
 <span class="comment-count tag is-black">댓글 {{ commentCount }}개</span>
 
@@ -145,7 +149,6 @@
             },
             success: function (response) {
                 if (response['result'] == 'success') {
-                    console.log(response['msg']);
                     $('.question-box').empty();
                     let temp_html = `
                         <div class="button-box question-select">
@@ -161,9 +164,7 @@
                     `
                     $('.question-box').append(temp_html);
 
-                    // 클릭 수 갱신
-                    $('.invitor_count').empty();
-                    $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
+                    dataReload(response)
                 } else {
                     alert("로그인 후 이용 가능합니다.");
                 }
@@ -184,9 +185,7 @@
                 "questionNum": 2
             },
             success: function (response) {
-                console.log(response);
                 if (response['result'] == 'success') {
-                    console.log(response['msg']);
                     $('.question-box').empty();
                     let temp_html = `
                         <div class="button-box">
@@ -202,9 +201,7 @@
                     `
                     $('.question-box').append(temp_html);
 
-                    // 클릭 수 갱신
-                    $('.invitor_count').empty();
-                    $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
+                    dataReload(response)
                 } else {
                     alert("로그인 후 이용 가능합니다.");
                 }
@@ -213,6 +210,24 @@
                 console.log("Error:", error);
             }
         });
+    }
+
+    function dataReload(response) {
+        let temp_html;
+
+        // 통계 갱신
+        $('.statistics-box').empty();
+        let same_check_count = response['statistics_data']['same_check_count'];
+        let check_percent = response['statistics_data']['check_percent'];
+        temp_html = `
+                        <div>${check_percent}%(${same_check_count}명)</div>
+                    `
+        $('.statistics-box').append(temp_html);
+
+        // 클릭 수 갱신
+        $('.invitor_count').empty();
+        temp_html = `<i class="fas fa-solid fa-users"></i>${response['participant_count']}`
+        $('.invitor_count').append(temp_html);
     }
 
     function question_refresh() {
