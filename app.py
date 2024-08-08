@@ -195,7 +195,7 @@ def register():
 
         existing_user = Member_collection.find_one({'id': member_id})
         if existing_user:
-            return render_template('register.html', message="User already exists", error=True)
+            return render_template('register.html', message="이미 가입된 계정입니다.", error=True)
 
         Member_collection.insert_one({
             'nickname': nickname,
@@ -206,7 +206,7 @@ def register():
             'participant_questions': [],
             'create_questions': []
         })
-        return render_template('login.html', message="You have successfully registered!", error=False)
+        return render_template('login.html', message="회원가입이 성공적으로 완료되었습니다.", error=False)
 
     return render_template('register.html')
 
