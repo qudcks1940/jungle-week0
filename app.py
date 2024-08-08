@@ -45,7 +45,6 @@ load_dotenv()
 
 # 환경 변수에서 secret key 로드
 app.secret_key = os.getenv('SECRET_KEY')
-print(app.secret_key)
 
 # 질문 등록 페이지
 @app.route('/question/newquestion')
@@ -67,7 +66,7 @@ def newQuestion():
         except jwt.InvalidTokenError:
             flash('Invalid token! Please log in again.', 'warning')
 
-    flash('You need to log in to access this page.', 'warning')
+    flash('접근할 수 없는 페이지 입니다.', 'warning')
     return redirect(url_for('home'))
 
 @app.route('/api/question/list', methods=['GET'])
@@ -242,7 +241,7 @@ def mypage():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('token', None)
-    flash('You have successfully logged out', 'success')
+    flash('로그아웃이 성공적으로 완료되었습니다.', 'success')
     return redirect(url_for('home'))
 
 # 질문 페이지
