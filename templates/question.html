@@ -19,269 +19,6 @@
 
     <title>질문</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-
-        $(document).ready(function(){
-            showComments();
-        });
-
-        $('#like-button').click(function(){
-            let questionId = $(this).data('question-id');
-            $.ajax({
-                url: "{{ url_for('increment_like') }}",
-                type: "POST",
-                data: { question_id: questionId },
-                success: function (response) {
-                    if (response['result'] == 'success') {
-                        if (response.like_count !== undefined) {
-                            $('#like-count').text(response.like_count);
-                            if (response.action === "liked") {
-                                $('#like-button').addClass('liked');
-                            } else {
-                                $('#like-button').removeClass('liked');
-                            }
-                        }
-                    } else {
-                        alert("로그인 후 이용 가능합니다.");
-                    }
-                },
-                error: function (error) {
-                    console.log("Error:", error);
-                }
-            });
-        });
-
-        function question1() {
-            let url = window.location.pathname;
-            let question_id = url.split('/').pop();
-            $.ajax({
-                url: `/api/question/${question_id}/click`,
-                type: "POST",
-                data: {
-                    "questionNum": 1
-                },
-                success: function (response) {
-                    if (response['result'] == 'success') {
-                        console.log(response['msg']);
-                        $('.question-box').empty();
-                        let temp_html = `
-                            <div class="button-box question-select">
-                                <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
-                            </div>
-                            <div class="versus">
-                                <span class="versus-v">V</span>
-                                <span class="versus-s">S</span>
-                            </div>
-                            <div class="button-box">
-                                <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
-                            </div>
-                        `
-                        $('.question-box').append(temp_html);
-
-                        // 클릭 수 갱신
-                        $('.invitor_count').empty();
-                        $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
-                    } else {
-                        alert("로그인 후 이용 가능합니다.");
-                    }
-                },
-                error: function (error) {
-                    console.log("Error:", error);
-                }
-            });
-        }
-
-        function question2() {
-            let url = window.location.pathname;
-            let question_id = url.split('/').pop();
-            $.ajax({
-                url: `/api/question/${question_id}/click`,
-                type: "POST",
-                data: {
-                    "questionNum": 2
-                },
-                success: function (response) {
-                    console.log(response);
-                    if (response['result'] == 'success') {
-                        console.log(response['msg']);
-                        $('.question-box').empty();
-                        let temp_html = `
-                            <div class="button-box">
-                                <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
-                            </div>
-                            <div class="versus">
-                                <span class="versus-v">V</span>
-                                <span class="versus-s">S</span>
-                            </div>
-                            <div class="button-box question-select">
-                                <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
-                            </div>
-                        `
-                        $('.question-box').append(temp_html);
-
-                        // 클릭 수 갱신
-                        $('.invitor_count').empty();
-                        $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
-                    } else {
-                        alert("로그인 후 이용 가능합니다.");
-                    }
-                },
-                error: function (error) {
-                    console.log("Error:", error);
-                }
-            });
-        }
-
-        function question_refresh() {
-            $('.question-box').empty();
-            let temp_html = `
-                <div class="button-box question-select">
-                <div class="button-box">
-                    <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
-                </div>
-                <div class="versus">
-                    <span class="versus-v">V</span>
-                    <span class="versus-s">S</span>
-                </div>
-                <div class="button-box question-select">
-                <div class="button-box">
-                    <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
-                </div>
-            `
-            $('.question-box').append(temp_html);
-        }
-
-        function showComments() {
-            $('.comment-input textarea').val('');
-            let url = window.location.pathname;
-            let question_id = url.split('/').pop();
-            $.ajax({
-                type: 'GET',
-                url: `/api/question/${question_id}/comment`,
-                success: function (response) {
-                    if (response['result'] == 'success') {
-                        $('.comment-list-area').empty()
-                        let commentList = response['commentList'];
-                        let currentUserId = "{{ current_user['_id'] }}";  // 현재 로그인한 사용자의 ID
-                        for (let i = 0; i < commentList.length; i++) {
-                            let comment = commentList[i];
-                            let commentId = comment['_id'];
-                            let writer = comment['nickname'];
-                            let createdAt = comment['created_at'];
-                            let content = comment['content'];
-                            let isOwner = comment['member_id'] === currentUserId;  // 작성자와 로그인한 사용자 비교
-                            let temp_html = `
-                            <div class="comment-area">
-                                <input class="comment-id" type="hidden" value="${commentId}">
-
-                                <!-- 기본 상태 -->
-                                <div class="comment-default-form" style="display: block;">
-                                    <div class="comment-box">
-                                        <div class="comment-nickname">
-                                            <span class="tag is-link is-light">${writer}</span>
-                                            <p class="created-at">${createdAt}</p>
-                                        </div>
-                                        <div class="comment-text">
-                                            <p>${content}</p>
-                                        </div>
-                                    </div>
-                                    ${isOwner ? `
-                                    <div class="comment-btn">
-                                        <button onclick="updateForm(this)" class="button is-small comment-update">수정</button>
-                                        <button onclick="deleteComment(this)" class="button is-small is-danger  is-light comment-delete">삭제</button>
-                                    </div>` : ''}
-                                </div>
-
-                                <!-- 수정 상태 -->
-                                ${isOwner ? `
-                                <div class="comment-update-form" style="display: none;">
-                                    <div class="comment-box">
-                                        <div class="comment-nickname">
-                                            <span class="tag is-link is-light">${writer}</span>
-                                            <p class="created-at">${createdAt}</p>
-                                        </div>
-                                        <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요">${content}</textarea>
-                                    </div>
-                                    <div class="comment-btn">
-                                        <button onclick="updateComment(this)" class="button is-small is-link is-light comment-update">수정</button>
-                                        <button onclick="defualtForm(this)" class="button is-small comment-delete">취소</button>
-                                    </div>
-                                </div>` : ''}
-                            </div>
-                        `;
-                            $('.comment-list-area').append(temp_html);
-                        }
-                    }
-                }
-            });
-        }
-
-        function addComment() {
-            let content = $('.comment-input textarea').val();
-            let url = window.location.pathname;
-            let question_id = url.split('/').pop();
-            $.ajax({
-                type: 'POST',
-                url: `/api/question/comment`,
-                data: {
-                    'questionId': question_id,
-                    'content': content
-                },
-                success: function (response) {
-                    if (response['result'] == 'success') {
-                        showComments();
-                    } else {
-                        alert("로그인 후 이용 가능합니다.");
-                    }
-                }
-            });
-        }
-
-        function updateComment(e) {
-            let commentId = $(e).closest('.comment-area').find('.comment-id').val();
-            let content = $(e).closest('.comment-area').find('textarea').val();
-            $.ajax({
-                type: 'PUT',
-                url: `/api/comment/${commentId}`,
-                data: {
-                    'content': content
-                },
-                success: function (response) {
-                    if (response['result'] == 'success') {
-                        console.log(response['msg']);
-                        showComments();
-                    }
-                }
-            });
-        }
-
-        function deleteComment(e) {
-            let commentId = $(e).closest('.comment-area').find('.comment-id').val();
-            $.ajax({
-                type: 'DELETE',
-                url: `/api/comment/${commentId}`,
-                success: function (response) {
-                    if (response['result'] == 'success') {
-                        console.log(response['msg']);
-                        showComments();
-                    }
-                }
-            });
-        }
-
-        function updateForm(e) {
-            $(e).closest('.comment-area').find('.comment-default-form').css('display', 'none');
-            $(e).closest('.comment-area').find('.comment-update-form').css('display', 'block');
-        }
-
-        function defualtForm(e) {
-            $(e).closest('.comment-area').find('.comment-default-form').css('display', 'block');
-            $(e).closest('.comment-area').find('.comment-update-form').css('display', 'none');
-
-            let todo = $(e).closest('.comment-area').find('.comment-text p').text();
-            $(e).closest('.comment-area').find('.comment-update-form textarea').val(todo);
-        }
-    </script>
 </head>
 
 <body>
@@ -365,5 +102,267 @@
     <!-- 댓글 목록 -->
 </section>
 </body>
+<script>
 
+    $(document).ready(function(){
+        showComments();
+    });
+
+    $('#like-button').click(function(){
+        let questionId = $(this).data('question-id');
+        $.ajax({
+            url: "{{ url_for('increment_like') }}",
+            type: "POST",
+            data: { question_id: questionId },
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    if (response.like_count !== undefined) {
+                        $('#like-count').text(response.like_count);
+                        if (response.action === "liked") {
+                            $('#like-button').addClass('liked');
+                        } else {
+                            $('#like-button').removeClass('liked');
+                        }
+                    }
+                } else {
+                    alert("로그인 후 이용 가능합니다.");
+                }
+            },
+            error: function (error) {
+                console.log("Error:", error);
+            }
+        });
+    });
+
+    function question1() {
+        let url = window.location.pathname;
+        let question_id = url.split('/').pop();
+        $.ajax({
+            url: `/api/question/${question_id}/click`,
+            type: "POST",
+            data: {
+                "questionNum": 1
+            },
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    console.log(response['msg']);
+                    $('.question-box').empty();
+                    let temp_html = `
+                        <div class="button-box question-select">
+                            <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
+                        </div>
+                        <div class="versus">
+                            <span class="versus-v">V</span>
+                            <span class="versus-s">S</span>
+                        </div>
+                        <div class="button-box">
+                            <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
+                        </div>
+                    `
+                    $('.question-box').append(temp_html);
+
+                    // 클릭 수 갱신
+                    $('.invitor_count').empty();
+                    $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
+                } else {
+                    alert("로그인 후 이용 가능합니다.");
+                }
+            },
+            error: function (error) {
+                console.log("Error:", error);
+            }
+        });
+    }
+
+    function question2() {
+        let url = window.location.pathname;
+        let question_id = url.split('/').pop();
+        $.ajax({
+            url: `/api/question/${question_id}/click`,
+            type: "POST",
+            data: {
+                "questionNum": 2
+            },
+            success: function (response) {
+                console.log(response);
+                if (response['result'] == 'success') {
+                    console.log(response['msg']);
+                    $('.question-box').empty();
+                    let temp_html = `
+                        <div class="button-box">
+                            <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
+                        </div>
+                        <div class="versus">
+                            <span class="versus-v">V</span>
+                            <span class="versus-s">S</span>
+                        </div>
+                        <div class="button-box question-select">
+                            <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
+                        </div>
+                    `
+                    $('.question-box').append(temp_html);
+
+                    // 클릭 수 갱신
+                    $('.invitor_count').empty();
+                    $('.invitor_count').append(`<i class="fas fa-solid fa-users"></i>${response['participant_count']}`);
+                } else {
+                    alert("로그인 후 이용 가능합니다.");
+                }
+            },
+            error: function (error) {
+                console.log("Error:", error);
+            }
+        });
+    }
+
+    function question_refresh() {
+        $('.question-box').empty();
+        let temp_html = `
+            <div class="button-box question-select">
+            <div class="button-box">
+                <button onclick="question1()" class="button question" data-question-id="{{ question['_id'] }}" data-check="1">{{ question['question1'] }}</button>
+            </div>
+            <div class="versus">
+                <span class="versus-v">V</span>
+                <span class="versus-s">S</span>
+            </div>
+            <div class="button-box question-select">
+            <div class="button-box">
+                <button onclick="question2()" class="button question" data-question-id="{{ question['_id'] }}" data-check="2">{{ question['question2'] }}</button>
+            </div>
+        `
+        $('.question-box').append(temp_html);
+    }
+
+    function showComments() {
+        $('.comment-input textarea').val('');
+        let url = window.location.pathname;
+        let question_id = url.split('/').pop();
+        $.ajax({
+            type: 'GET',
+            url: `/api/question/${question_id}/comment`,
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    $('.comment-list-area').empty()
+                    let commentList = response['commentList'];
+                    let currentUserId = "{{ current_user['_id'] }}";  // 현재 로그인한 사용자의 ID
+                    for (let i = 0; i < commentList.length; i++) {
+                        let comment = commentList[i];
+                        let commentId = comment['_id'];
+                        let writer = comment['nickname'];
+                        let createdAt = comment['created_at'];
+                        let content = comment['content'];
+                        let isOwner = comment['member_id'] === currentUserId;  // 작성자와 로그인한 사용자 비교
+                        let temp_html = `
+                        <div class="comment-area">
+                            <input class="comment-id" type="hidden" value="${commentId}">
+
+                            <!-- 기본 상태 -->
+                            <div class="comment-default-form" style="display: block;">
+                                <div class="comment-box">
+                                    <div class="comment-nickname">
+                                        <span class="tag is-link is-light">${writer}</span>
+                                        <p class="created-at">${createdAt}</p>
+                                    </div>
+                                    <div class="comment-text">
+                                        <p>${content}</p>
+                                    </div>
+                                </div>
+                                ${isOwner ? `
+                                <div class="comment-btn">
+                                    <button onclick="updateForm(this)" class="button is-small comment-update">수정</button>
+                                    <button onclick="deleteComment(this)" class="button is-small is-danger  is-light comment-delete">삭제</button>
+                                </div>` : ''}
+                            </div>
+
+                            <!-- 수정 상태 -->
+                            ${isOwner ? `
+                            <div class="comment-update-form" style="display: none;">
+                                <div class="comment-box">
+                                    <div class="comment-nickname">
+                                        <span class="tag is-link is-light">${writer}</span>
+                                        <p class="created-at">${createdAt}</p>
+                                    </div>
+                                    <textarea class="textarea is-success" rows="3" name="comment" placeholder="댓글을 작성해주세요">${content}</textarea>
+                                </div>
+                                <div class="comment-btn">
+                                    <button onclick="updateComment(this)" class="button is-small is-link is-light comment-update">수정</button>
+                                    <button onclick="defualtForm(this)" class="button is-small comment-delete">취소</button>
+                                </div>
+                            </div>` : ''}
+                        </div>
+                    `;
+                        $('.comment-list-area').append(temp_html);
+                    }
+                }
+            }
+        });
+    }
+
+    function addComment() {
+        let content = $('.comment-input textarea').val();
+        let url = window.location.pathname;
+        let question_id = url.split('/').pop();
+        $.ajax({
+            type: 'POST',
+            url: `/api/question/comment`,
+            data: {
+                'questionId': question_id,
+                'content': content
+            },
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    showComments();
+                } else {
+                    alert("로그인 후 이용 가능합니다.");
+                }
+            }
+        });
+    }
+
+    function updateComment(e) {
+        let commentId = $(e).closest('.comment-area').find('.comment-id').val();
+        let content = $(e).closest('.comment-area').find('textarea').val();
+        $.ajax({
+            type: 'PUT',
+            url: `/api/comment/${commentId}`,
+            data: {
+                'content': content
+            },
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    console.log(response['msg']);
+                    showComments();
+                }
+            }
+        });
+    }
+
+    function deleteComment(e) {
+        let commentId = $(e).closest('.comment-area').find('.comment-id').val();
+        $.ajax({
+            type: 'DELETE',
+            url: `/api/comment/${commentId}`,
+            success: function (response) {
+                if (response['result'] == 'success') {
+                    console.log(response['msg']);
+                    showComments();
+                }
+            }
+        });
+    }
+
+    function updateForm(e) {
+        $(e).closest('.comment-area').find('.comment-default-form').css('display', 'none');
+        $(e).closest('.comment-area').find('.comment-update-form').css('display', 'block');
+    }
+
+    function defualtForm(e) {
+        $(e).closest('.comment-area').find('.comment-default-form').css('display', 'block');
+        $(e).closest('.comment-area').find('.comment-update-form').css('display', 'none');
+
+        let todo = $(e).closest('.comment-area').find('.comment-text p').text();
+        $(e).closest('.comment-area').find('.comment-update-form textarea').val(todo);
+    }
+</script>
 </html>
