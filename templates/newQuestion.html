@@ -16,6 +16,14 @@
             let category = $('.select select').val();
             let question1 = $('.new-question-section .input').eq(0).val();
             let question2 = $('.new-question-section .input').eq(1).val();
+            if (!category) {
+                alert("카테고리를 선택해주세요");
+                return;
+            }
+            else if (question1 == "" || question2 == "") {
+                alert("질문을 입력해주세요");
+                return;
+            }
 
             // 세션에 저장된 토큰 가져오기
             let token = sessionStorage.getItem('token');
