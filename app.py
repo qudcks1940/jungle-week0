@@ -40,6 +40,12 @@ class CustomJSONProvider(JSONProvider):
 app.json = CustomJSONProvider(app)
 #######################################################################
 
+# .env 파일 로드
+#load_dotenv()
+
+# 환경 변수에서 secret key 로드
+app.secret_key = os.getenv('SECRET_KEY')
+
 # 질문 등록 페이지
 @app.route('/question/newquestion')
 def newQuestion():
@@ -105,13 +111,6 @@ def list_question():
 
  
     return jsonify({'questions': questions_list})
-
-
-# .env 파일 로드
-load_dotenv()
-
-# 환경 변수에서 secret key 로드
-app.secret_key = os.getenv('SECRET_KEY')
 
 # 사용자명(id)에 대한 고유 인덱스 생성
 Member_collection.create_index('id', unique=True)
