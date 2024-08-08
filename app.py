@@ -41,10 +41,11 @@ app.json = CustomJSONProvider(app)
 #######################################################################
 
 # .env 파일 로드
-#load_dotenv()
+load_dotenv()
 
 # 환경 변수에서 secret key 로드
 app.secret_key = os.getenv('SECRET_KEY')
+print(app.secret_key)
 
 # 질문 등록 페이지
 @app.route('/question/newquestion')
